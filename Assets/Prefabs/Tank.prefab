@@ -128,6 +128,7 @@ GameObject:
   - component: {fileID: 6701336515927352304}
   - component: {fileID: 9180668691085642093}
   - component: {fileID: 4678091104971820692}
+  - component: {fileID: 4215981999310530931}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -180,6 +181,27 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4215981999310530931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019761205506631155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26a45aac5ae4da844a0754b4b541473f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 5
+  TurretSpeed: 180
+  TurretPivot: {fileID: 447064162792183295}
+  Lump: {fileID: 8638994206137757736}
+  MaxTurretAngle: 180
+  MinTurretAngle: 1
+  BulletPower: 15
+  BulletPrefab: {fileID: 5495807823143105126, guid: abf0d82ec976ffe458d07de60fdda579,
+    type: 3}
 --- !u!1 &3488449329680485465
 GameObject:
   m_ObjectHideFlags: 0
