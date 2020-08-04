@@ -13,6 +13,10 @@ public class GameManager : MonoBehaviour
 	public List<Tank> Players;
 	public int CurrentPlayer;
 
+	public int WindTurns;
+	public int WindDirection;
+	public float WindPower;
+
 	public static GameManager GetReference()
 	{
 		if (reference == null)
@@ -67,6 +71,11 @@ public class GameManager : MonoBehaviour
 
 	}
 
+	public Vector3 GetWind()
+	{
+		return new Vector3(WindDirection * WindPower, 0f, 0f);
+	}
+
 	public Tank GetCurrentPlayer()
 	{
 		return Players[CurrentPlayer];
@@ -74,6 +83,13 @@ public class GameManager : MonoBehaviour
 
 	public void BulletLanded()
 	{
+		CurrentPlayer++;
+		if (CurrentPlayer == Players.Count)
+		{
+			CurrentPlayer = 0;
+			NextTurn();
+		}
+
 		int winner = CheckWinner();
 		if (winner == -1)
 		{
@@ -99,12 +115,6 @@ public class GameManager : MonoBehaviour
 	public void NextPlayer()
 	{
 		GetCurrentPlayer().MyTurn = false;
-		CurrentPlayer++;
-		if (CurrentPlayer == Players.Count)
-		{
-			CurrentPlayer = 0;
-			NextTurn();
-		}
 	}
 
 	/// <summary>
@@ -113,6 +123,11 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	private void NextTurn()
 	{
-
+		WindTurns--;
+		if (WindTurns <= 0)
+		{
+			WindDirection = Random.Range(-1, 2);
+			WindTurns = Random.Range(1, 4);
+		}
 	}
 }

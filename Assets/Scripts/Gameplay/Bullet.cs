@@ -21,6 +21,7 @@ public class Bullet : MonoBehaviour
 	{
 		transform.Translate(velocity * Time.deltaTime);
 		velocity += Physics.gravity * Time.deltaTime;
+		velocity += manager.GetWind() * Time.deltaTime;
 
 		CheckGround();
 	}
