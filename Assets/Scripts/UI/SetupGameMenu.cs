@@ -54,7 +54,12 @@ public class SetupGameMenu : MonoBehaviour
 			PlayerSetup playerData = PlayerDataList[i];
 			Tank tank = Instantiate(TankPrefab, TankParent).GetComponent<Tank>();
 			tank.transform.position = new Vector3((i + 1) * offset, 0f, 0f);
-			tank.Init(playerData.GetName(), i, playerData.GetColor());
+			Tank.ControlType controlType = Tank.ControlType.LocalPlayer;
+			if (playerData.IsComputer())
+			{
+				controlType = Tank.ControlType.NormalAI;
+			}
+			tank.Init(playerData.GetName(), i, playerData.GetColor(), controlType);
 			manager.Players.Add(tank);
 		}
 

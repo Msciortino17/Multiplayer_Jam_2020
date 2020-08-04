@@ -328,7 +328,7 @@ MonoBehaviour:
   CurrentPlayer: 0
   WindTurns: 0
   WindDirection: 1
-  WindPower: 10
+  WindPower: 8
 --- !u!4 &53492708
 Transform:
   m_ObjectHideFlags: 0
@@ -5224,7 +5224,7 @@ MonoBehaviour:
   MapWidth: 51
   NumPoints: 100
   GenFrequency: 3
-  GenAmplitude: 1
+  GenAmplitude: 3
   GenBottom: 10
   DunePrefab: {fileID: 4594932126126424294, guid: 676fbd5396dbb054e84a7687e2e83c06,
     type: 3}

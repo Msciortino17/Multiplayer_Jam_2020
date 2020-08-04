@@ -4,10 +4,21 @@ using UnityEngine;
 
 public class Tank : MonoBehaviour
 {
+	public enum ControlType
+	{
+		LocalPlayer,
+		EasyAI,
+		NormalAI,
+		HardAI,
+		NetworkPlayer
+	}
+	private ControlType MyControlType;
+
 	private Terrain terrain;
 	private GameManager manager;
 
-	public float MoveSpeed;
+	public float MinMoveSpeed;
+	public float MaxMoveSpeed;
 
 	// Turret and bullet stuff
 	public float TurretSpeed;
@@ -31,9 +42,15 @@ public class Tank : MonoBehaviour
 	public SpriteRenderer TurretSprite;
 	public SpriteRenderer LumpSprite;
 
+	// Trajectory preview
+	public LineRenderer TrajectoryLine;
+	public int NumTrajectoryPoints = 10;
+	public float TrajectoryTempo = 0.1f;
+
 	// Start is called before the first frame update
 	void Start()
 	{
+		TrajectoryLine.positionCount = NumTrajectoryPoints;
 	}
 
 	// Update is called once per frame
@@ -41,8 +58,9 @@ public class Tank : MonoBehaviour
 	{
 		if (MyTurn)
 		{
-			MoveHorizontally();
-			AimTurret();
+			HorizontalInput();
+			TurretInput();
+
 			WrapWorld();
 			AdjustAngle();
 
@@ -50,7 +68,7 @@ public class Tank : MonoBehaviour
 		}
 	}
 
-	public void Init(string name, int id, Color color)
+	public void Init(string name, int id, Color color, ControlType controlType)
 	{
 		terrain = Terrain.GetReference();
 		manager = GameManager.GetReference();
@@ -59,6 +77,7 @@ public class Tank : MonoBehaviour
 
 		TankName = name;
 		IDNumber = id;
+		MyControlType = controlType;
 
 		ChasisSprite.color = color;
 		TurretSprite.color = color;
@@ -78,22 +97,29 @@ public class Tank : MonoBehaviour
 		}
 	}
 
-	private void MoveHorizontally()
+	private void HorizontalInput()
 	{
+
 		if (Input.GetKey(KeyCode.LeftArrow) && Fuel > 0f)
 		{
-			transform.Translate(transform.right * -MoveSpeed * Time.deltaTime, Space.World);
+			float slope = terrain.GetSlopeAtX(transform.position.x);
+			slope = (slope + 1) * 0.5f;
+			float moveSpeed = Mathf.Lerp(MinMoveSpeed, MaxMoveSpeed, slope);
+			transform.Translate(transform.right * -moveSpeed * Time.deltaTime, Space.World);
 			Fuel -= FuelConsumption * Time.deltaTime;
 		}
 
 		if (Input.GetKey(KeyCode.RightArrow) && Fuel > 0f)
 		{
-			transform.Translate(transform.right * MoveSpeed * Time.deltaTime, Space.World);
+			float slope = terrain.GetSlopeAtX(transform.position.x);
+			slope = (slope + 1) * 0.5f;
+			float moveSpeed = Mathf.Lerp(MaxMoveSpeed, MinMoveSpeed, slope);
+			transform.Translate(transform.right * moveSpeed * Time.deltaTime, Space.World);
 			Fuel -= FuelConsumption * Time.deltaTime;
 		}
 	}
 
-	private void AimTurret()
+	private void TurretInput()
 	{
 		float turretAngle = TurretPivot.localRotation.eulerAngles.z;
 		if (Input.GetKey(KeyCode.UpArrow) && turretAngle < MaxTurretAngle)
@@ -106,8 +132,20 @@ public class Tank : MonoBehaviour
 			TurretPivot.Rotate(0f, 0f, -TurretSpeed * Time.deltaTime);
 		}
 
-		if (Input.GetKeyDown(KeyCode.Space))
+		//if (Input.GetKeyDown(KeyCode.Space))
+		//{
+		//	TrajectoryLine.gameObject.SetActive(true);
+		//}
+
+		//if (Input.GetKey(KeyCode.Space))
+		//{
+		//	UpdateTrajectory();
+		//}
+
+		if (Input.GetKeyUp(KeyCode.Space))
 		{
+			//TrajectoryLine.gameObject.SetActive(false);
+
 			// Setup the bullet
 			GameObject bullet = Instantiate(BulletPrefab);
 			Vector3 bulletVector = Lump.position - TurretPivot.position;
@@ -152,5 +190,26 @@ public class Tank : MonoBehaviour
 		float slope = terrain.GetSlopeAtX(transform.position.x);
 		float angle = terrain.SlopeToDegrees(slope);
 		transform.rotation = Quaternion.Euler(0f, 0f, angle);
+	}
+
+	private void UpdateTrajectory()
+	{
+		Vector3 bulletVector = Lump.position - TurretPivot.position;
+		bulletVector.Normalize();
+		bulletVector *= BulletPower;
+
+		List<Vector3> trajectoryPoints = new List<Vector3>();
+		Vector3 currentPoint = Lump.transform.position;
+		for (int i = 0; i < NumTrajectoryPoints; i++)
+		{
+			trajectoryPoints.Add(currentPoint);
+
+			currentPoint += bulletVector * TrajectoryTempo;
+			bulletVector += Physics.gravity * TrajectoryTempo;
+			bulletVector += manager.GetWind() * TrajectoryTempo;
+
+		}
+
+		TrajectoryLine.SetPositions(trajectoryPoints.ToArray());
 	}
 }

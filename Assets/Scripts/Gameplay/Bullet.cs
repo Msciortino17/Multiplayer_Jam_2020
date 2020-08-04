@@ -23,6 +23,7 @@ public class Bullet : MonoBehaviour
 		velocity += Physics.gravity * Time.deltaTime;
 		velocity += manager.GetWind() * Time.deltaTime;
 
+		WrapWorld();
 		CheckGround();
 	}
 
@@ -53,5 +54,22 @@ public class Bullet : MonoBehaviour
 		Destroy(gameObject);
 		manager.BulletLanded();
 		// todo - cause different effects here depending on the bullet
+	}
+
+	private void WrapWorld()
+	{
+		if (transform.position.x > terrain.MapWidth)
+		{
+			Vector3 position = transform.position;
+			position.x = 0.001f;
+			transform.position = position;
+		}
+
+		if (transform.position.x < 0f)
+		{
+			Vector3 position = transform.position;
+			position.x = terrain.MapWidth - 0.001f;
+			transform.position = position;
+		}
 	}
 }
