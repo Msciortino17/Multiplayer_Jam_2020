@@ -20,18 +20,20 @@ public class Tank : MonoBehaviour
 
 	// Game loop stuff
 	public int IDNumber;
+	public string TankName;
 	public bool MyTurn;
 	public float Health;
 	public float Fuel;
 	public float FuelConsumption;
 
+	// Color stuff
+	public SpriteRenderer ChasisSprite;
+	public SpriteRenderer TurretSprite;
+	public SpriteRenderer LumpSprite;
+
 	// Start is called before the first frame update
 	void Start()
 	{
-		terrain = Terrain.GetReference();
-		manager = GameManager.GetReference();
-		AdjustHeight();
-		AdjustAngle();
 	}
 
 	// Update is called once per frame
@@ -44,8 +46,23 @@ public class Tank : MonoBehaviour
 			WrapWorld();
 			AdjustAngle();
 
-			DebugText.SetText("Player " + IDNumber + ", Health: " + Health.ToString("0.00") + ", Fuel: " + Fuel.ToString("0.00"));
+			DebugText.SetText(TankName + ", Health: " + Health.ToString("0.00") + ", Fuel: " + Fuel.ToString("0.00"));
 		}
+	}
+
+	public void Init(string name, int id, Color color)
+	{
+		terrain = Terrain.GetReference();
+		manager = GameManager.GetReference();
+		AdjustHeight();
+		AdjustAngle();
+
+		TankName = name;
+		IDNumber = id;
+
+		ChasisSprite.color = color;
+		TurretSprite.color = color;
+		LumpSprite.color = color;
 	}
 
 	public void StartTurn()

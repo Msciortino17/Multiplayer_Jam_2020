@@ -32,11 +32,6 @@ public class Terrain : MonoBehaviour
 	// Start is called before the first frame update
 	void Awake()
 	{
-		DuneWidth = MapWidth / NumPoints;
-		heightMap = new float[NumPoints];
-
-		GenerateTerrain();
-		SetupDunes();
 	}
 
 	// Update is called once per frame
@@ -47,6 +42,15 @@ public class Terrain : MonoBehaviour
 			GenerateTerrain();
 			SetupDunes();
 		}
+	}
+
+	public void Init()
+	{
+		DuneWidth = MapWidth / NumPoints;
+		heightMap = new float[NumPoints];
+
+		GenerateTerrain();
+		SetupDunes();
 	}
 
 	private void GenerateTerrain()

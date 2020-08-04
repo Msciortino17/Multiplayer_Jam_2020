@@ -195,17 +195,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 3
   TurretSpeed: 90
-  TurretPivot: {fileID: 447064162792183295}
-  Lump: {fileID: 8638994206137757736}
   MaxTurretAngle: 180
   MinTurretAngle: 1
   BulletPower: 15
   BulletPrefab: {fileID: 5495807823143105126, guid: abf0d82ec976ffe458d07de60fdda579,
     type: 3}
+  TurretPivot: {fileID: 447064162792183295}
+  Lump: {fileID: 8638994206137757736}
+  IDNumber: 0
+  TankName: 
   MyTurn: 0
   Health: 100
   Fuel: 100
   FuelConsumption: 20
+  ChasisSprite: {fileID: 5644014026121841245}
+  TurretSprite: {fileID: 8535610025884820043}
+  LumpSprite: {fileID: 8121859142264164187}
 --- !u!1 &3488449329680485465
 GameObject:
   m_ObjectHideFlags: 0

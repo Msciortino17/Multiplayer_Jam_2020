@@ -1,10 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
 	static GameManager reference;
+
+	public GameOverMenu GameOverRef;
+	public Text GameOverText;
 
 	public List<Tank> Players;
 	public int CurrentPlayer;
@@ -21,17 +25,18 @@ public class GameManager : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		GetCurrentPlayer().MyTurn = true;
-		for (int i = 0; i < Players.Count; i++)
-		{
-			Players[i].IDNumber = i + 1;
-		}
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
 
+	}
+
+	public void Init()
+	{
+		CurrentPlayer = 0;
+		GetCurrentPlayer().MyTurn = true;
 	}
 
 	private int CheckWinner()
@@ -76,7 +81,15 @@ public class GameManager : MonoBehaviour
 		}
 		else
 		{
-			DebugText.SetText("Winner! Player " + (winner + 1));
+			GameOverRef.gameObject.SetActive(true);
+			GameOverText.text = "Game Over\n\nThe winner is " + Players[winner].TankName;
+
+			// Clear out players
+			foreach (var player in Players)
+			{
+				Destroy(player.gameObject);
+			}
+			Players.Clear();
 		}
 	}
 
