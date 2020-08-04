@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
 	public void Init()
 	{
 		CurrentPlayer = 0;
-		GetCurrentPlayer().MyTurn = true;
+		GetCurrentPlayer().StartTurn();
 	}
 
 	private int CheckWinner()

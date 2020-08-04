@@ -10,7 +10,7 @@ public class PlayerSetup : MonoBehaviour
 	public InputField NameField;
 	public Image MyColorDisplay;
 	public int MyColor;
-	public Toggle IsComputerRef;
+	public Dropdown MyControlType;
 
 	// Start is called before the first frame update
 	void Start()
@@ -35,9 +35,9 @@ public class PlayerSetup : MonoBehaviour
 		return SetupGameRef.ColorOptions[MyColor];
 	}
 
-	public bool IsComputer()
+	public Tank.ControlType GetControlType()
 	{
-		return IsComputerRef.isOn;
+		return (Tank.ControlType)MyControlType.value;
 	}
 
 	public void NextColor()
