@@ -37,7 +37,7 @@ public class PlayerSetup : MonoBehaviour
 
 	public bool IsComputer()
 	{
-		return IsComputerRef.enabled;
+		return IsComputerRef.isOn;
 	}
 
 	public void NextColor()

@@ -214,7 +214,7 @@ MonoBehaviour:
   TurretSprite: {fileID: 8535610025884820043}
   LumpSprite: {fileID: 8121859142264164187}
   TrajectoryLine: {fileID: 1470291794178131096}
-  NumTrajectoryPoints: 4
+  NumTrajectoryPoints: 100
   TrajectoryTempo: 0.1
 --- !u!1 &3488449329680485465
 GameObject:
@@ -486,14 +486,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3738712462432046239}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: 0.23591247, w: 0.97177434}
   m_LocalPosition: {x: 0, y: 0.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7400658338040119456}
   m_Father: {fileID: 6048048101104767809}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 27.291}
 --- !u!212 &1416600966531150323
 SpriteRenderer:
   m_ObjectHideFlags: 0

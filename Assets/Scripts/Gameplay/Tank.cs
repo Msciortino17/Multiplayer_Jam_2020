@@ -47,6 +47,14 @@ public class Tank : MonoBehaviour
 	public int NumTrajectoryPoints = 10;
 	public float TrajectoryTempo = 0.1f;
 
+	// AI control stuff
+	private bool AI_moving;
+	private int AI_rotateDirection;
+	private float AI_aimTimer;
+	private float AI_fireTimer;
+	private float AI_xPosGoal;
+	private float AI_accuracy;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -58,13 +66,25 @@ public class Tank : MonoBehaviour
 	{
 		if (MyTurn)
 		{
-			HorizontalInput();
-			TurretInput();
+			if (MyControlType == ControlType.LocalPlayer)
+			{
+				HorizontalInput();
+				TurretInput();
+			}
+			else if (MyControlType == ControlType.NetworkPlayer)
+			{
+				// todo
+			}
+			else
+			{
+				ComputerInput();
+			}
 
 			WrapWorld();
 			AdjustAngle();
 
-			DebugText.SetText(TankName + ", Health: " + Health.ToString("0.00") + ", Fuel: " + Fuel.ToString("0.00"));
+			bool shouldHit = ShouldHitSomething(0.25f, 0.1f, 100);
+			DebugText.SetText(TankName + ", Health: " + Health.ToString("0.00") + ", Fuel: " + Fuel.ToString("0.00") + ", Target: " + shouldHit);
 		}
 	}
 
@@ -95,28 +115,56 @@ public class Tank : MonoBehaviour
 			manager.NextPlayer();
 			manager.BulletLanded();
 		}
+
+		if (MyControlType != ControlType.LocalPlayer && MyControlType != ControlType.NetworkPlayer)
+		{
+			float mapTenth = terrain.MapWidth * 0.1f;
+			AI_xPosGoal = transform.position.x;
+			AI_xPosGoal += Random.Range(-mapTenth, mapTenth);
+			if (AI_xPosGoal < 0f)
+			{
+				AI_xPosGoal += terrain.MapWidth;
+			}
+			else if (AI_xPosGoal > terrain.MapWidth)
+			{
+				AI_xPosGoal -= terrain.MapWidth;
+			}
+			AI_moving = true;
+			AI_fireTimer = 0.3f;
+			AI_aimTimer = 2f;
+			AI_rotateDirection = Random.Range(0, 2) == 0 ? -1 : 1;
+		}
 	}
 
 	private void HorizontalInput()
 	{
-
 		if (Input.GetKey(KeyCode.LeftArrow) && Fuel > 0f)
 		{
-			float slope = terrain.GetSlopeAtX(transform.position.x);
-			slope = (slope + 1) * 0.5f;
-			float moveSpeed = Mathf.Lerp(MinMoveSpeed, MaxMoveSpeed, slope);
-			transform.Translate(transform.right * -moveSpeed * Time.deltaTime, Space.World);
-			Fuel -= FuelConsumption * Time.deltaTime;
+			MoveLeft();
 		}
 
 		if (Input.GetKey(KeyCode.RightArrow) && Fuel > 0f)
 		{
-			float slope = terrain.GetSlopeAtX(transform.position.x);
-			slope = (slope + 1) * 0.5f;
-			float moveSpeed = Mathf.Lerp(MaxMoveSpeed, MinMoveSpeed, slope);
-			transform.Translate(transform.right * moveSpeed * Time.deltaTime, Space.World);
-			Fuel -= FuelConsumption * Time.deltaTime;
+			MoveRight();
 		}
+	}
+
+	private void MoveLeft()
+	{
+		float slope = terrain.GetSlopeAtX(transform.position.x);
+		slope = (slope + 1) * 0.5f;
+		float moveSpeed = Mathf.Lerp(MinMoveSpeed, MaxMoveSpeed, slope);
+		transform.Translate(transform.right * -moveSpeed * Time.deltaTime, Space.World);
+		Fuel -= FuelConsumption * Time.deltaTime;
+	}
+
+	private void MoveRight()
+	{
+		float slope = terrain.GetSlopeAtX(transform.position.x);
+		slope = (slope + 1) * 0.5f;
+		float moveSpeed = Mathf.Lerp(MaxMoveSpeed, MinMoveSpeed, slope);
+		transform.Translate(transform.right * moveSpeed * Time.deltaTime, Space.World);
+		Fuel -= FuelConsumption * Time.deltaTime;
 	}
 
 	private void TurretInput()
@@ -132,31 +180,124 @@ public class Tank : MonoBehaviour
 			TurretPivot.Rotate(0f, 0f, -TurretSpeed * Time.deltaTime);
 		}
 
-		//if (Input.GetKeyDown(KeyCode.Space))
-		//{
-		//	TrajectoryLine.gameObject.SetActive(true);
-		//}
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+			TrajectoryLine.gameObject.SetActive(true);
+		}
 
-		//if (Input.GetKey(KeyCode.Space))
-		//{
-		//	UpdateTrajectory();
-		//}
+		if (Input.GetKey(KeyCode.Space))
+		{
+			UpdateTrajectory();
+		}
 
 		if (Input.GetKeyUp(KeyCode.Space))
 		{
-			//TrajectoryLine.gameObject.SetActive(false);
-
-			// Setup the bullet
-			GameObject bullet = Instantiate(BulletPrefab);
-			Vector3 bulletVector = Lump.position - TurretPivot.position;
-			bulletVector.Normalize();
-			bulletVector *= BulletPower;
-			bullet.GetComponent<Bullet>().velocity = bulletVector;
-			bullet.transform.position = Lump.position;
-
-			// End turn
-			manager.NextPlayer();
+			TrajectoryLine.gameObject.SetActive(false);
+			FireBullet();
 		}
+	}
+
+	private void FireBullet()
+	{
+		// Setup the bullet
+		GameObject bullet = Instantiate(BulletPrefab);
+		Vector3 bulletVector = Lump.position - TurretPivot.position;
+		bulletVector.Normalize();
+		bulletVector *= BulletPower;
+		bullet.GetComponent<Bullet>().velocity = bulletVector;
+		bullet.transform.position = Lump.position;
+
+		// End turn
+		manager.NextPlayer();
+	}
+	
+	private void ComputerInput()
+	{
+		if (AI_moving)
+		{
+			float toGoal = AI_xPosGoal - transform.position.x;
+			if (Mathf.Abs(toGoal) < 0.1f)
+			{
+				AI_moving = false;
+				TrajectoryLine.gameObject.SetActive(true);
+			}
+			else if (toGoal < 0f)
+			{
+				MoveLeft();
+			}
+			else if (toGoal > 0f)
+			{
+				MoveRight();
+			}
+			if (Fuel <= 0f)
+			{
+				AI_moving = false;
+				TrajectoryLine.gameObject.SetActive(true);
+			}
+		}
+		else
+		{
+			if (AI_aimTimer > 0f)
+			{
+				UpdateTrajectory();
+				AI_aimTimer -= Time.deltaTime;
+
+				float turretAngle = TurretPivot.localRotation.eulerAngles.z;
+				if (turretAngle > MaxTurretAngle || turretAngle < MinTurretAngle)
+				{
+					AI_rotateDirection *= -1;
+				}
+				TurretPivot.Rotate(0f, 0f, AI_rotateDirection * TurretSpeed * Time.deltaTime);
+
+				if (ShouldHitSomething(0.12f, 0.1f, 50))
+				{
+					AI_aimTimer = 0f;
+				}
+			}
+			else if (AI_fireTimer > 0f)
+			{
+				TrajectoryLine.gameObject.SetActive(false);
+				AI_fireTimer -= Time.deltaTime;
+				if (AI_fireTimer <= 0f)
+				{
+					FireBullet();
+				}
+			}
+		}
+	}
+
+	private bool ShouldHitSomething(float radius, float tempo, int checks)
+	{
+		Vector3 bulletVector = Lump.position - TurretPivot.position;
+		bulletVector.Normalize();
+		bulletVector *= BulletPower;
+
+		Vector3 currentPoint = Lump.transform.position;
+		for (int i = 0; i < NumTrajectoryPoints; i++)
+		{
+			float height = terrain.GetHeightAtX(currentPoint.x);
+			if (height > currentPoint.y)
+			{
+				return false;
+			}
+
+			Collider[] colliders = Physics.OverlapSphere(currentPoint, radius);
+			foreach (Collider collider in colliders)
+			{
+				Tank other = collider.GetComponent<Tank>();
+				if (other != null && other != this)
+				{
+					return true;
+				}
+			}
+
+			currentPoint += bulletVector * TrajectoryTempo;
+			bulletVector += Physics.gravity * TrajectoryTempo;
+			bulletVector += manager.GetWind() * TrajectoryTempo;
+
+		}
+
+		return false;
 	}
 
 	private void WrapWorld()
