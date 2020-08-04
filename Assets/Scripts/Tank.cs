@@ -5,44 +5,74 @@ using UnityEngine;
 public class Tank : MonoBehaviour
 {
 	private Terrain terrain;
+	private GameManager manager;
 
 	public float MoveSpeed;
-	public float TurretSpeed;
 
-	public Transform TurretPivot;
-	public Transform Lump;
+	// Turret and bullet stuff
+	public float TurretSpeed;
 	public float MaxTurretAngle;
 	public float MinTurretAngle;
-
 	public float BulletPower;
 	public GameObject BulletPrefab;
+	public Transform TurretPivot;
+	public Transform Lump;
+
+	// Game loop stuff
+	public int IDNumber;
+	public bool MyTurn;
+	public float Health;
+	public float Fuel;
+	public float FuelConsumption;
 
 	// Start is called before the first frame update
 	void Start()
 	{
 		terrain = Terrain.GetReference();
+		manager = GameManager.GetReference();
 		AdjustHeight();
+		AdjustAngle();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		MoveHorizontally();
-		AimTurret();
-		WrapWorld();
-		AdjustAngle();
+		if (MyTurn)
+		{
+			MoveHorizontally();
+			AimTurret();
+			WrapWorld();
+			AdjustAngle();
+
+			DebugText.SetText("Player " + IDNumber + ", Health: " + Health.ToString("0.00") + ", Fuel: " + Fuel.ToString("0.00"));
+		}
+	}
+
+	public void StartTurn()
+	{
+		MyTurn = true;
+		Fuel = 100f;
+
+		// Skip turn if dead
+		if (Health <= 0f)
+		{
+			manager.NextPlayer();
+			manager.BulletLanded();
+		}
 	}
 
 	private void MoveHorizontally()
 	{
-		if (Input.GetKey(KeyCode.LeftArrow))
+		if (Input.GetKey(KeyCode.LeftArrow) && Fuel > 0f)
 		{
 			transform.Translate(transform.right * -MoveSpeed * Time.deltaTime, Space.World);
+			Fuel -= FuelConsumption * Time.deltaTime;
 		}
 
-		if (Input.GetKey(KeyCode.RightArrow))
+		if (Input.GetKey(KeyCode.RightArrow) && Fuel > 0f)
 		{
 			transform.Translate(transform.right * MoveSpeed * Time.deltaTime, Space.World);
+			Fuel -= FuelConsumption * Time.deltaTime;
 		}
 	}
 
@@ -61,12 +91,16 @@ public class Tank : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
+			// Setup the bullet
 			GameObject bullet = Instantiate(BulletPrefab);
 			Vector3 bulletVector = Lump.position - TurretPivot.position;
 			bulletVector.Normalize();
 			bulletVector *= BulletPower;
 			bullet.GetComponent<Bullet>().velocity = bulletVector;
 			bullet.transform.position = Lump.position;
+
+			// End turn
+			manager.NextPlayer();
 		}
 	}
 

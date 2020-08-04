@@ -5,6 +5,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
 	private Terrain terrain;
+	private GameManager manager;
 
 	public Vector3 velocity;
 
@@ -12,7 +13,7 @@ public class Bullet : MonoBehaviour
 	void Start()
 	{
 		terrain = Terrain.GetReference();
-
+		manager = GameManager.GetReference();
 	}
 
 	// Update is called once per frame
@@ -26,6 +27,12 @@ public class Bullet : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
+		Tank otherTank = other.GetComponent<Tank>();
+		if (otherTank != null)
+		{
+			otherTank.Health -= 100f;
+		}
+
 		Explode();
 	}
 
@@ -43,6 +50,7 @@ public class Bullet : MonoBehaviour
 	{
 		Debug.Log("kaboom!");
 		Destroy(gameObject);
+		manager.BulletLanded();
 		// todo - cause different effects here depending on the bullet
 	}
 }

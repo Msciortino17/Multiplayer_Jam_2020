@@ -96,6 +96,11 @@ public class Terrain : MonoBehaviour
 		float adjsutedX = x / DuneWidth;
 		int p1 = (int)adjsutedX;
 
+		if (p1 < 0 || p1 >= heightMap.Length)
+		{
+			return 0f;
+		}
+
 		return heightMap[p1];
 	}
 

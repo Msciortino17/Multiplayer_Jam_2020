@@ -193,8 +193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26a45aac5ae4da844a0754b4b541473f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 5
-  TurretSpeed: 180
+  MoveSpeed: 3
+  TurretSpeed: 90
   TurretPivot: {fileID: 447064162792183295}
   Lump: {fileID: 8638994206137757736}
   MaxTurretAngle: 180
@@ -202,6 +202,10 @@ MonoBehaviour:
   BulletPower: 15
   BulletPrefab: {fileID: 5495807823143105126, guid: abf0d82ec976ffe458d07de60fdda579,
     type: 3}
+  MyTurn: 0
+  Health: 100
+  Fuel: 100
+  FuelConsumption: 20
 --- !u!1 &3488449329680485465
 GameObject:
   m_ObjectHideFlags: 0
