@@ -57,6 +57,12 @@ public class Tank : MonoBehaviour
 	private float AI_xPosGoal;
 	private float AI_accuracy;
 
+	// Bumpers for doing movement checks
+	public Transform BumperUR;
+	public Transform BumperLR;
+	public Transform BumperUL;
+	public Transform BumperLL;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -167,12 +173,12 @@ public class Tank : MonoBehaviour
 
 	private void HorizontalInput()
 	{
-		if (Input.GetKey(KeyCode.LeftArrow) && Fuel > 0f)
+		if (Input.GetKey(KeyCode.LeftArrow) && Fuel > 0f && CanMoveLeft())
 		{
 			MoveLeft();
 		}
 
-		if (Input.GetKey(KeyCode.RightArrow) && Fuel > 0f)
+		if (Input.GetKey(KeyCode.RightArrow) && Fuel > 0f && CanMoveRight())
 		{
 			MoveRight();
 		}
@@ -212,6 +218,7 @@ public class Tank : MonoBehaviour
 	{
 		if (AI_moving)
 		{
+			FlailTurret();
 			float toGoal = AI_xPosGoal - transform.position.x;
 			if (Mathf.Abs(toGoal) < 0.1f)
 			{
@@ -220,11 +227,27 @@ public class Tank : MonoBehaviour
 			}
 			else if (toGoal < 0f || toGoal > terrain.MapWidth * 0.5f)
 			{
-				MoveLeft();
+				if (CanMoveLeft())
+				{
+					MoveLeft();
+				}
+				else
+				{
+					AI_moving = false;
+					TrajectoryLine.gameObject.SetActive(true);
+				}
 			}
 			else if (toGoal > 0f || toGoal < -terrain.MapWidth * 0.5f)
 			{
-				MoveRight();
+				if (CanMoveRight())
+				{
+					MoveRight();
+				}
+				else
+				{
+					AI_moving = false;
+					TrajectoryLine.gameObject.SetActive(true);
+				}
 			}
 			if (Fuel <= 0f)
 			{
@@ -239,19 +262,7 @@ public class Tank : MonoBehaviour
 				UpdateTrajectory();
 				AI_aimTimer -= Time.deltaTime;
 
-				float turretAngle = TurretPivot.localRotation.eulerAngles.z;
-
-				if (AI_rotateDirection == -1 && turretAngle < MinTurretAngle)
-				{
-					AI_rotateDirection = 1;
-				}
-
-				if (AI_rotateDirection == 1 && turretAngle > MaxTurretAngle)
-				{
-					AI_rotateDirection = -1;
-				}
-
-				TurretPivot.Rotate(0f, 0f, AI_rotateDirection * TurretSpeed * Time.deltaTime);
+				FlailTurret();
 
 				float radius = Mathf.Lerp(1f, 0.1f, AI_accuracy);
 				if (ShouldHitSomething(radius, 0.1f, 50))
@@ -269,6 +280,23 @@ public class Tank : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	private void FlailTurret()
+	{
+		float turretAngle = TurretPivot.localRotation.eulerAngles.z;
+
+		if (AI_rotateDirection == -1 && turretAngle < MinTurretAngle)
+		{
+			AI_rotateDirection = 1;
+		}
+
+		if (AI_rotateDirection == 1 && turretAngle > MaxTurretAngle)
+		{
+			AI_rotateDirection = -1;
+		}
+
+		TurretPivot.Rotate(0f, 0f, AI_rotateDirection * TurretSpeed * Time.deltaTime);
 	}
 
 	private void MoveLeft()
@@ -310,7 +338,7 @@ public class Tank : MonoBehaviour
 		bulletVector *= BulletPower;
 
 		Vector3 currentPoint = Lump.transform.position;
-		for (int i = 0; i < NumTrajectoryPoints; i++)
+		for (int i = 0; i < checks; i++)
 		{
 			float height = terrain.GetHeightAtX(currentPoint.x);
 			if (height > currentPoint.y)
@@ -322,13 +350,13 @@ public class Tank : MonoBehaviour
 			foreach (Collider collider in colliders)
 			{
 				Tank other = collider.GetComponent<Tank>();
-				if (other != null && other != this && other.Health > 0f)
+				if (other != null && other.IDNumber != IDNumber && other.Health > 0f)
 				{
 					return true;
 				}
 			}
 
-			currentPoint += bulletVector * TrajectoryTempo;
+			currentPoint += bulletVector * tempo;
 			if (currentPoint.x > terrain.MapWidth)
 			{
 				currentPoint.x = 0.001f;
@@ -338,12 +366,28 @@ public class Tank : MonoBehaviour
 				currentPoint.x = terrain.MapWidth - 0.001f;
 			}
 
-			bulletVector += Physics.gravity * TrajectoryTempo;
-			bulletVector += manager.GetWind() * TrajectoryTempo;
+			bulletVector += Physics.gravity * tempo;
+			bulletVector += manager.GetWind() * tempo;
 
 		}
 
 		return false;
+	}
+
+	private bool CanMoveRight()
+	{
+		bool upperClear = !Physics.Raycast(BumperUR.position, BumperUR.right, 0.5f);
+		bool lowerClear = !Physics.Raycast(BumperLR.position, BumperUR.right, 0.5f);
+
+		return upperClear && lowerClear;
+	}
+
+	private bool CanMoveLeft()
+	{
+		bool upperClear = !Physics.Raycast(BumperUL.position, BumperUL.right, 0.5f);
+		bool lowerClear = !Physics.Raycast(BumperLL.position, BumperUL.right, 0.5f);
+
+		return upperClear && lowerClear;
 	}
 
 	private void WrapWorld()

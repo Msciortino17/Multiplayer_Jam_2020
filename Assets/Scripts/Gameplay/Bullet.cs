@@ -50,7 +50,6 @@ public class Bullet : MonoBehaviour
 
 	private void Explode()
 	{
-		Debug.Log("kaboom!");
 		Destroy(gameObject);
 		manager.BulletLanded();
 		// todo - cause different effects here depending on the bullet
