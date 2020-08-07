@@ -16,8 +16,7 @@ public class Sandstorm : MonoBehaviour
 	{
 		if (direction == 0)
 		{
-			LeftWind.Stop();
-			RightWind.Stop();
+			Stop();
 		}
 		else if (direction == -1)
 		{
@@ -29,5 +28,11 @@ public class Sandstorm : MonoBehaviour
 			LeftWind.Play();
 			RightWind.Stop();
 		}
+	}
+
+	public void Stop()
+	{
+		LeftWind.Stop();
+		RightWind.Stop();
 	}
 }

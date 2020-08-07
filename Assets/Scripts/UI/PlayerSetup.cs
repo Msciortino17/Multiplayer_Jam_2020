@@ -10,6 +10,7 @@ public class PlayerSetup : MonoBehaviour
 {
 	public int PlayerNumber;
 	public int OnlineNumber = -1;
+	public Player MyPlayer;
 
 	public SetupGameMenu SetupGameRef;
 	public InputField NameField;

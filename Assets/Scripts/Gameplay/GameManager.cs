@@ -9,6 +9,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class GameManager : MonoBehaviourPunCallbacks
 {
 	static GameManager reference;
+	public SetupGameMenu SetupGameRef;
 
 	public bool OnlineGame;
 	public bool Started;
@@ -141,6 +142,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 			PlayerTanks.Clear();
 
 			Started = false;
+			SetupGameRef.Clear();
+			SetWind(0, 0);
 		}
 	}
 
@@ -161,20 +164,27 @@ public class GameManager : MonoBehaviourPunCallbacks
 		WindTurns--;
 		if (WindTurns <= 0)
 		{
-			if (!OnlineGame || PhotonNetwork.IsMasterClient)
-			{
-				WindDirection = Random.Range(-1, 2);
-				WindTurns = Random.Range(1, 2);
-				SandstormRef.UpdateWind(WindDirection);
-			}
+			int windDirection = Random.Range(-1, 2);
+			int windTurns = Random.Range(1, 2);
+			SetWind(windDirection, windTurns);
+		}
+	}
 
-			if (OnlineGame)
-			{
-				Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
-				hash["WindDirection"] = WindDirection;
-				hash["WindTurns"] = WindTurns;
-				PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
-			}
+	public void SetWind(int direction, int turns)
+	{
+		if (!OnlineGame || PhotonNetwork.IsMasterClient)
+		{
+			WindDirection = direction;
+			WindTurns = turns;
+			SandstormRef.UpdateWind(WindDirection);
+		}
+
+		if (OnlineGame)
+		{
+			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+			hash["WindDirection"] = WindDirection;
+			hash["WindTurns"] = WindTurns;
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 		}
 	}
 

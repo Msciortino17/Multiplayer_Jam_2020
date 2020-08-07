@@ -19,10 +19,10 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 	public MainMenu MainMenuRef;
 	public GameObject Players;
-	public GameObject OnlinePlayerDataPrefab;
 	public List<PlayerSetup> PlayerDataList;
 	public List<Color> ColorOptions;
 	public Dropdown TerrainType;
+	public Button StartButton;
 
 	private Terrain terrain;
 	private GameManager manager;
@@ -49,6 +49,8 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	// Start is called before the first frame update
 	void Start()
 	{
+		StartButton.interactable = !(FromOnlineSetup && !PhotonNetwork.IsMasterClient);
+
 		terrain = Terrain.GetReference();
 		manager = GameManager.GetReference();
 	}
@@ -58,10 +60,21 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	/// </summary>
 	public void Clear()
 	{
-		NumLoadedTanks = 0;
-		OnlineGameStarted = false;
-		WaitingForOthersToStart = false;
-		PhotonNetwork.CurrentRoom.IsOpen = true;
+		if (FromOnlineSetup)
+		{
+			NumLoadedTanks = 0;
+			WaitingForOthersToStart = false;
+			PhotonNetwork.CurrentRoom.IsOpen = true;
+			OnlineGameStarted = false;
+
+			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+			hash["GameStarted"] = OnlineGameStarted;
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+
+			Hashtable hashPlayer = PhotonNetwork.LocalPlayer.CustomProperties;
+			hashPlayer["InLobby"] = false;
+			PhotonNetwork.LocalPlayer.SetCustomProperties(hashPlayer);
+		}
 	}
 
 	// Update is called once per frame
@@ -111,8 +124,21 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 		if (FromOnlineSetup)
 		{
-			StartOnlineGame();
-			RefreshUIWrite();
+			// Verify everyone's in the lobby
+			bool ready = true;
+			foreach (Player player in PhotonNetwork.PlayerList)
+			{
+				if (!(bool)player.CustomProperties["InLobby"])
+				{
+					ready = false;
+				}
+			}
+
+			if (ready)
+			{
+				StartOnlineGame();
+				RefreshUIWrite();
+			}
 		}
 		else
 		{
@@ -218,15 +244,6 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		return activeCount;
 	}
 
-	public override void OnPlayerEnteredRoom(Player newPlayer)
-	{
-		if (PhotonNetwork.IsMasterClient)
-		{
-			PlayerJoinedroom(newPlayer);
-			RefreshUIWrite();
-		}
-	}
-
 	// todo - convert these to use player data
 	public void RefreshUIWrite()
 	{
@@ -255,12 +272,6 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	public void RefreshUIRead()
 	{
 		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
-
-		// Sometimes get a random hash with only 253 as a key...
-		//if (hash.Keys.Count == 1)
-		//{
-		//	return;
-		//}
 		TerrainType.value = (int)hash["TerrainType"];
 
 		for (int i = 0; i < PlayerDataList.Count; i++)
@@ -288,6 +299,14 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			player.MyColorDisplay.color = player.GetColor();
 			player.SetControlType((Tank.ControlType)controlType);
 		}
+	}
+
+	private void StartOnlineGameCheck(Hashtable hash)
+	{
+		if (!hash.ContainsKey("GameStarted"))
+		{
+			return;
+		}
 
 		if ((bool)hash["GameStarted"] && !OnlineGameStarted)
 		{
@@ -298,6 +317,16 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	public override void OnRoomPropertiesUpdate(Hashtable hash)
 	{
 		RefreshUIRead();
+		StartOnlineGameCheck(hash);
+	}
+
+	public override void OnPlayerEnteredRoom(Player newPlayer)
+	{
+		if (PhotonNetwork.IsMasterClient)
+		{
+			PlayerJoinedroom(newPlayer);
+			RefreshUIWrite();
+		}
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -316,6 +345,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			if (!player.Active.activeInHierarchy && player.OnlineNumber == -1)
 			{
 				player.OnlineNumber = newPlayer.ActorNumber;
+				player.MyPlayer = newPlayer;
 				player.SetName(newPlayer.NickName);
 				player.AddPlayer();
 				return;

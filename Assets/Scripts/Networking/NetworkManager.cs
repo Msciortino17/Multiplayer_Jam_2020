@@ -63,6 +63,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		PhotonNetwork.CurrentRoom.SetCustomProperties(schema);
 	}
 
+	public void PlayerSchema(Player player)
+	{
+		Hashtable schema = new Hashtable();
+
+		schema.Add("InLobby", true);
+
+		player.SetCustomProperties(schema);
+	}
+
 	#region Main wrappers
 
 	public void Connect()
@@ -112,6 +121,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public override void OnCreatedRoom()
 	{
 		RoomSchema();
+		PlayerSchema(PhotonNetwork.MasterClient);
+	}
+
+	public override void OnPlayerEnteredRoom(Player newPlayer)
+	{
+		PlayerSchema(newPlayer);
 	}
 
 	public override void OnJoinedRoom()

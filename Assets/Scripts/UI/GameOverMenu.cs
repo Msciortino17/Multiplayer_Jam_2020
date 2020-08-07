@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class GameOverMenu : MonoBehaviour
 {
@@ -21,13 +23,20 @@ public class GameOverMenu : MonoBehaviour
 
 	public void Continue()
 	{
-		SetupGameRef.Clear();
+		if (SetupGameRef.FromOnlineSetup)
+		{
+			Hashtable hashPlayer = PhotonNetwork.LocalPlayer.CustomProperties;
+			hashPlayer["InLobby"] = true;
+			PhotonNetwork.LocalPlayer.SetCustomProperties(hashPlayer);
+		}
+
 		SetupGameRef.gameObject.SetActive(true);
 		gameObject.SetActive(false);
 	}
 
 	public void Exit()
 	{
+		SetupGameRef.Exit();
 		MainMenuRef.gameObject.SetActive(true);
 		gameObject.SetActive(false);
 	}
