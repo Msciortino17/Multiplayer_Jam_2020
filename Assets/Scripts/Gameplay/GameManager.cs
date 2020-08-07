@@ -139,6 +139,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 				Destroy(player.gameObject);
 			}
 			PlayerTanks.Clear();
+
+			Started = false;
 		}
 	}
 
@@ -159,15 +161,20 @@ public class GameManager : MonoBehaviourPunCallbacks
 		WindTurns--;
 		if (WindTurns <= 0)
 		{
-			// Make these into room properties
-			WindDirection = Random.Range(-1, 2);
-			WindTurns = Random.Range(1, 2);
-			SandstormRef.UpdateWind(WindDirection);
+			if (!OnlineGame || PhotonNetwork.IsMasterClient)
+			{
+				WindDirection = Random.Range(-1, 2);
+				WindTurns = Random.Range(1, 2);
+				SandstormRef.UpdateWind(WindDirection);
+			}
 
-			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
-			hash["WindDirection"] = WindDirection;
-			hash["WindTurns"] = WindTurns;
-			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+			if (OnlineGame)
+			{
+				Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+				hash["WindDirection"] = WindDirection;
+				hash["WindTurns"] = WindTurns;
+				PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+			}
 		}
 	}
 

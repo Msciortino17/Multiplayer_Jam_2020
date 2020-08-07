@@ -21,6 +21,7 @@ public class GameOverMenu : MonoBehaviour
 
 	public void Continue()
 	{
+		SetupGameRef.Clear();
 		SetupGameRef.gameObject.SetActive(true);
 		gameObject.SetActive(false);
 	}

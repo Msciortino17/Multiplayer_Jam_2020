@@ -60,6 +60,8 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	{
 		NumLoadedTanks = 0;
 		OnlineGameStarted = false;
+		WaitingForOthersToStart = false;
+		PhotonNetwork.CurrentRoom.IsOpen = true;
 	}
 
 	// Update is called once per frame

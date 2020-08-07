@@ -218,8 +218,14 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		if (Input.GetKeyUp(KeyCode.Space))
 		{
 			TrajectoryLine.gameObject.SetActive(false);
-			//FireBullet();
-			photonView.RPC("FireBullet", RpcTarget.All);
+			if (OnlineNumber == -1)
+			{
+				FireBullet();
+			}
+			else
+			{
+				photonView.RPC("FireBullet", RpcTarget.All);
+			}
 		}
 	}
 
