@@ -1,9 +1,11 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
+public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
 	public enum ControlType
 	{
@@ -16,6 +18,8 @@ public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
 	public ControlType MyControlType;
 
 	public int OnlineNumber = -1;
+	public Player MyPlayer;
+	public Text MyHoverText;
 
 	private Terrain terrain;
 	private GameManager manager;
@@ -93,9 +97,9 @@ public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
 
 			WrapWorld();
 			AdjustAngle();
-
-			DebugText.SetText(TankName + ", Health: " + Health.ToString("0.00") + ", Fuel: " + Fuel.ToString("0.00"));
 		}
+
+		MyHoverText.text = TankName + " : " + OnlineNumber + "\n" + ", Health: " + Health.ToString("0.00") + "\nFuel: " + Fuel.ToString("0.00");
 	}
 
 	void OnCollisionEnter(Collision collision)
@@ -214,7 +218,8 @@ public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
 		if (Input.GetKeyUp(KeyCode.Space))
 		{
 			TrajectoryLine.gameObject.SetActive(false);
-			FireBullet();
+			//FireBullet();
+			photonView.RPC("FireBullet", RpcTarget.All);
 		}
 	}
 
@@ -321,6 +326,7 @@ public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
 		Fuel -= FuelConsumption * Time.deltaTime;
 	}
 
+	[PunRPC]
 	private void FireBullet()
 	{
 		// Setup the bullet
@@ -454,12 +460,12 @@ public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
 		terrain = Terrain.GetReference();
 
 		int actorNum = info.Sender.ActorNumber;
+		OnlineNumber = actorNum;
+		terrain.Init();
 		if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber)
 		{
 			return;
 		}
-
-		OnlineNumber = actorNum;
 
 		SetupGameMenu setup = SetupGameMenu.GetReference();
 		int playerCount = setup.GetPlayerCount();
@@ -475,7 +481,8 @@ public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
 					Vector3 position = new Vector3((counter + 1) * offset, 0f, 0f);
 					transform.parent = setup.TankParent;
 					Init(playerData.GetName(), counter, playerData.GetColor(), ControlType.NetworkPlayer);
-					manager.Players.Add(this);
+					manager.PlayerTanks.Add(this);
+					Debug.Log("hello???");
 				}
 				counter++;
 			}

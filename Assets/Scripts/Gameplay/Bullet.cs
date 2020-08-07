@@ -32,7 +32,7 @@ public class Bullet : MonoBehaviour
 		Tank otherTank = other.GetComponent<Tank>();
 		if (otherTank != null)
 		{
-			otherTank.Health -= 20f;
+			otherTank.Health -= 40f;
 		}
 
 		Explode();

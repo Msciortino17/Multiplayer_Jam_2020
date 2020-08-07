@@ -6,6 +6,8 @@ public class Terrain : MonoBehaviour
 {
 	static Terrain reference;
 
+	public bool initialized;
+
 	// Main data model
 	private float[] heightMap;
 	public float MapWidth;
@@ -46,6 +48,12 @@ public class Terrain : MonoBehaviour
 
 	public void Init()
 	{
+		if (initialized)
+		{
+			return;
+		}
+		initialized = true;
+
 		DuneWidth = MapWidth / NumPoints;
 		heightMap = new float[NumPoints];
 
@@ -116,6 +124,12 @@ public class Terrain : MonoBehaviour
 		if (p2 == NumPoints)
 		{
 			p2 = 0;
+		}
+
+		// problem
+		if (p1 < 0 || p1 >= NumPoints - 1)
+		{
+			Debug.Log("beeg x: " + x);
 		}
 
 		float width1 = p1 * DuneWidth;

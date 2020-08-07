@@ -53,6 +53,15 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		manager = GameManager.GetReference();
 	}
 
+	/// <summary>
+	/// Resets all settings, values, etc to how they should be on a fresh game startup
+	/// </summary>
+	public void Clear()
+	{
+		NumLoadedTanks = 0;
+		OnlineGameStarted = false;
+	}
+
 	// Update is called once per frame
 	void Update()
 	{
@@ -71,7 +80,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 				//	}
 				//}
 
-				manager.Init();
+				manager.Init(FromOnlineSetup);
 				gameObject.SetActive(false);
 			}
 		}
@@ -87,7 +96,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		}
 		else
 		{
-			RefreshUIRead(PhotonNetwork.CurrentRoom.CustomProperties);
+			RefreshUIRead();
 		}
 	}
 
@@ -100,7 +109,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 		if (FromOnlineSetup)
 		{
-			OnlineGameStarted = true;
+			StartOnlineGame();
 			RefreshUIWrite();
 		}
 		else
@@ -111,6 +120,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 	public void StartOnlineGame()
 	{
+		OnlineGameStarted = true;
 		PhotonNetwork.CurrentRoom.IsOpen = false;
 
 		int playerCount = GetPlayerCount();
@@ -120,7 +130,6 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		}
 
 		terrain.Init();
-		manager.Players = new List<Tank>();
 
 		float offset = terrain.MapWidth / (playerCount + 1);
 		int counter = 0;
@@ -135,14 +144,15 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 					Tank tank = PhotonNetwork.Instantiate(TankPrefab.name, position, Quaternion.identity).GetComponent<Tank>();
 					tank.transform.parent = TankParent;
 					tank.Init(playerData.GetName(), counter, playerData.GetColor(), Tank.ControlType.LocalPlayer);
-					manager.Players.Add(tank);
+					manager.PlayerTanks.Add(tank);
+					Debug.Log("hello?");
 				}
 				counter++;
 			}
 		}
 
 		WaitingForOthersToStart = true;
-		NumLoadedTanks = 1;
+		NumLoadedTanks++;
 	}
 
 	public void StartLocalGame()
@@ -154,7 +164,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		}
 
 		terrain.Init();
-		manager.Players = new List<Tank>();
+		manager.PlayerTanks = new List<Tank>();
 
 		float offset = terrain.MapWidth / (playerCount + 1);
 		int counter = 0;
@@ -167,12 +177,12 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 				tank.transform.position = new Vector3((counter + 1) * offset, 0f, 0f);
 				Tank.ControlType controlType = playerData.GetControlType();
 				tank.Init(playerData.GetName(), counter, playerData.GetColor(), controlType);
-				manager.Players.Add(tank);
+				manager.PlayerTanks.Add(tank);
 				counter++;
 			}
 		}
 
-		manager.Init();
+		manager.Init(FromOnlineSetup);
 
 		gameObject.SetActive(false);
 	}
@@ -181,8 +191,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	{
 		if (FromOnlineSetup)
 		{
-			NumLoadedTanks = 0;
-			OnlineGameStarted = false;
+			Clear();
 			PhotonNetwork.Disconnect();
 			MainMenuRef.gameObject.SetActive(true);
 		}
@@ -207,20 +216,8 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		return activeCount;
 	}
 
-	public void DebugNetwork()
-	{
-		string message = "There are currently " + PhotonNetwork.CurrentRoom.PlayerCount + " players in this room.\n";
-		message += "Your name is " + PhotonNetwork.NickName + "\n";
-		if (network.IsHost)
-		{
-			message += "And you are the host.";
-		}
-		DebugText.SetText(message);
-	}
-
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
-		Debug.Log("someone else joined room");
 		if (PhotonNetwork.IsMasterClient)
 		{
 			PlayerJoinedroom(newPlayer);
@@ -236,35 +233,33 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			return;
 		}
 
-		Hashtable hash = new Hashtable();
+		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 		for (int i = 0; i < PlayerDataList.Count; i++)
 		{
 			string prefix = "Player_" + i + "_";
 			PlayerSetup player = PlayerDataList[i];
-			hash.Add(prefix + "Active", player.Active.activeInHierarchy);
-			hash.Add(prefix + "OnlineNumber", player.OnlineNumber);
-			hash.Add(prefix + "Nickname", player.GetName());
-			hash.Add(prefix + "Color", player.MyColor);
-			hash.Add(prefix + "ControlType", (int)player.GetControlType());
+			hash[prefix + "Active"] = player.Active.activeInHierarchy;
+			hash[prefix + "OnlineNumber"] = player.OnlineNumber;
+			hash[prefix + "Nickname"] = player.GetName();
+			hash[prefix + "Color"] = player.MyColor;
+			hash[prefix + "ControlType"] = (int)player.GetControlType();
 		}
-		hash.Add("TerrainType", TerrainType.value);
-		hash.Add("GameStarted", OnlineGameStarted);
+
+		hash["TerrainType"] = TerrainType.value;
+		hash["GameStarted"] = OnlineGameStarted;
 		PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 	}
 
-	public void RefreshUIRead(Hashtable hash)
+	public void RefreshUIRead()
 	{
-		// Sometimes get a random hash with only 253 as a key...
-		if (hash.Keys.Count == 1)
-		{
-			return;
-		}
+		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
-		if ((bool)hash["GameStarted"])
-		{
-			StartOnlineGame();
-			return;
-		}
+		// Sometimes get a random hash with only 253 as a key...
+		//if (hash.Keys.Count == 1)
+		//{
+		//	return;
+		//}
+		TerrainType.value = (int)hash["TerrainType"];
 
 		for (int i = 0; i < PlayerDataList.Count; i++)
 		{
@@ -291,12 +286,16 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			player.MyColorDisplay.color = player.GetColor();
 			player.SetControlType((Tank.ControlType)controlType);
 		}
-		TerrainType.value = (int)hash["TerrainType"];
+
+		if ((bool)hash["GameStarted"] && !OnlineGameStarted)
+		{
+			StartOnlineGame();
+		}
 	}
 
 	public override void OnRoomPropertiesUpdate(Hashtable hash)
 	{
-		RefreshUIRead(hash);
+		RefreshUIRead();
 	}
 
 	public override void OnPlayerLeftRoom(Player otherPlayer)

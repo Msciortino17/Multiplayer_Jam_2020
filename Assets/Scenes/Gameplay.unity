@@ -529,10 +529,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48de4614f0676404ab8187d54e1924c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnlineGame: 0
   SandstormRef: {fileID: 1193551775}
   GameOverRef: {fileID: 1616587272}
   GameOverText: {fileID: 1942574707}
-  Players: []
+  PlayerTanks: []
   CurrentPlayer: 0
   WindTurns: 0
   WindDirection: 1
@@ -16454,6 +16455,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FromOnlineSetup: 0
+  OnlineGameStarted: 0
   MainMenuRef: {fileID: 1191397971}
   Players: {fileID: 29453231}
   OnlinePlayerDataPrefab: {fileID: 0}
@@ -16475,6 +16477,8 @@ MonoBehaviour:
   TankParent: {fileID: 1964814383}
   TankPrefab: {fileID: 1019761205506631155, guid: bd13a8a0e04b3a547ace3c6eb57c14d3,
     type: 3}
+  WaitingForOthersToStart: 0
+  NumLoadedTanks: 0
 --- !u!114 &638601522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23156,6 +23160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e851a566157d26428595236968cf471, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initialized: 0
   MapWidth: 50
   NumPoints: 250
   GenFrequency: 0.5
@@ -29882,6 +29887,51 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1951830092
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1951830094}
+  - component: {fileID: 1951830093}
+  m_Layer: 0
+  m_Name: PhotonMono
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1951830093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951830092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 177bddf229f8d8445a70c0652f03b7df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  KeepAliveInBackground: 60000
+  ApplyDontDestroyOnLoad: 1
+--- !u!4 &1951830094
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951830092}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1954089622
 GameObject:
   m_ObjectHideFlags: 0

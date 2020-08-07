@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -26,7 +27,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	void Awake()
 	{
-
 	}
 
 	// Start is called before the first frame update
@@ -39,6 +39,28 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	void Update()
 	{
 
+	}
+
+	private void RoomSchema()
+	{
+		Hashtable schema = new Hashtable();
+
+		schema.Add("WindDirection", 0);
+		schema.Add("WindTurns", 0);
+
+		for (int i = 0; i < 4; i++)
+		{
+			string prefix = "Player_" + i + "_";
+			schema.Add(prefix + "Active", false);
+			schema.Add(prefix + "OnlineNumber", -1);
+			schema.Add(prefix + "Nickname", "Player " + (i + 1));
+			schema.Add(prefix + "Color", 0);
+			schema.Add(prefix + "ControlType", 4);
+		}
+		schema.Add("TerrainType", 0);
+		schema.Add("GameStarted", false);
+
+		PhotonNetwork.CurrentRoom.SetCustomProperties(schema);
 	}
 
 	#region Main wrappers
@@ -85,6 +107,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public override void OnDisconnected(DisconnectCause cause)
 	{
 		Debug.Log("Disconnected from server. Reason: " + cause.ToString());
+	}
+
+	public override void OnCreatedRoom()
+	{
+		RoomSchema();
 	}
 
 	public override void OnJoinedRoom()

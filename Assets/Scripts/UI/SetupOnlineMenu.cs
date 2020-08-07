@@ -39,7 +39,6 @@ public class SetupOnlineMenu : MonoBehaviourPunCallbacks
 				SetupGameRef.FromOnlineSetup = true;
 				SetupGameRef.gameObject.SetActive(true);
 				SetupGameRef.InitNetwork();
-				SetupGameRef.DebugNetwork();
 				gameObject.SetActive(false);
 			}
 		}

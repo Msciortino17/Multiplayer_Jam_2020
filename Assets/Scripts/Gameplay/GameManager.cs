@@ -1,17 +1,23 @@
-﻿using System.Collections;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
 	static GameManager reference;
+
+	public bool OnlineGame;
+	public bool Started;
 
 	public Sandstorm SandstormRef;
 	public GameOverMenu GameOverRef;
 	public Text GameOverText;
 
-	public List<Tank> Players;
+	public List<Tank> PlayerTanks;
 	public int CurrentPlayer;
 
 	public int WindTurns;
@@ -35,33 +41,47 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-
+		if (Started)
+		{
+			string message = "Current player: " + CurrentPlayer;
+			message += "\n" + GetCurrentPlayer().TankName + " : " + GetCurrentPlayer().OnlineNumber;
+			DebugText.SetText(message);
+		}
 	}
 
-	public void Init()
+	public void Init(bool online)
 	{
+		Started = true;
+		OnlineGame = online;
 		CurrentPlayer = 0;
 		GetCurrentPlayer().StartTurn();
+
+		string message = "Account nums:";
+		for (int i = 0; i < PlayerTanks.Count; i++)
+		{
+			message += "\nindex: " + i + ", Account num: " + PlayerTanks[i].OnlineNumber;
+		}
+		Debug.Log(message);
 	}
 
 	private int CheckWinner()
 	{
 		// Tally up the dead to see if there's one left
 		int deathCheck = 0;
-		for (int i = 0; i < Players.Count; i++)
+		for (int i = 0; i < PlayerTanks.Count; i++)
 		{
-			if (Players[i].Health <= 0f)
+			if (PlayerTanks[i].Health <= 0f)
 			{
 				deathCheck++;
 			}
 		}
 
-		if (deathCheck == Players.Count - 1)
+		if (deathCheck == PlayerTanks.Count - 1)
 		{
 			// Sift through to see who has any health
-			for (int i = 0; i < Players.Count; i++)
+			for (int i = 0; i < PlayerTanks.Count; i++)
 			{
-				if (Players[i].Health > 0f)
+				if (PlayerTanks[i].Health > 0f)
 				{
 					return i;
 				}
@@ -79,13 +99,25 @@ public class GameManager : MonoBehaviour
 
 	public Tank GetCurrentPlayer()
 	{
-		return Players[CurrentPlayer];
+		if (OnlineGame)
+		{
+			for (int i = 0; i < PlayerTanks.Count; i++)
+			{
+				//Debug.Log("index: " + i + ", online num: " + PlayerTanks[i].OnlineNumber);
+				if (PlayerTanks[i].OnlineNumber - 1 == CurrentPlayer)
+				{
+					return PlayerTanks[i];
+				}
+			}
+		}
+		//Debug.Log("hmm");
+		return PlayerTanks[CurrentPlayer];
 	}
 
 	public void BulletLanded()
 	{
 		CurrentPlayer++;
-		if (CurrentPlayer == Players.Count)
+		if (CurrentPlayer == PlayerTanks.Count)
 		{
 			CurrentPlayer = 0;
 			NextTurn();
@@ -99,14 +131,14 @@ public class GameManager : MonoBehaviour
 		else
 		{
 			GameOverRef.gameObject.SetActive(true);
-			GameOverText.text = "Game Over\n\nThe winner is " + Players[winner].TankName;
+			GameOverText.text = "Game Over\n\nThe winner is " + PlayerTanks[winner].TankName;
 
 			// Clear out players
-			foreach (var player in Players)
+			foreach (var player in PlayerTanks)
 			{
 				Destroy(player.gameObject);
 			}
-			Players.Clear();
+			PlayerTanks.Clear();
 		}
 	}
 
@@ -129,8 +161,21 @@ public class GameManager : MonoBehaviour
 		{
 			// Make these into room properties
 			WindDirection = Random.Range(-1, 2);
-			WindTurns = Random.Range(1, 4);
+			WindTurns = Random.Range(1, 2);
 			SandstormRef.UpdateWind(WindDirection);
+
+			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+			hash["WindDirection"] = WindDirection;
+			hash["WindTurns"] = WindTurns;
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 		}
+	}
+
+	public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+	{
+		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+		WindDirection = (int)hash["WindDirection"];
+		WindTurns = (int)hash["WindTurns"];
+		SandstormRef.UpdateWind(WindDirection);
 	}
 }
