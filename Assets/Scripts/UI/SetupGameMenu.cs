@@ -12,7 +12,10 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class SetupGameMenu : MonoBehaviourPunCallbacks
 {
+	static SetupGameMenu reference;
+
 	public bool FromOnlineSetup;
+	public bool OnlineGameStarted;
 
 	public MainMenu MainMenuRef;
 	public GameObject Players;
@@ -26,6 +29,18 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	NetworkManager network;
 	public Transform TankParent;
 	public GameObject TankPrefab;
+
+	public bool WaitingForOthersToStart;
+	public int NumLoadedTanks;
+
+	public static SetupGameMenu GetReference()
+	{
+		if (reference == null)
+		{
+			reference = GameObject.Find("Canvas").transform.Find("Setup Game").GetComponent<SetupGameMenu>();
+		}
+		return reference;
+	}
 
 	void Awake()
 	{
@@ -44,6 +59,21 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		if (FromOnlineSetup)
 		{
 			TerrainType.interactable = PhotonNetwork.IsMasterClient;
+
+			if (WaitingForOthersToStart && NumLoadedTanks == GetPlayerCount())
+			{
+				//for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+				//{
+				//	Player player = PhotonNetwork.PlayerList[i];
+				//	if (!(bool)player.CustomProperties["Ready"])
+				//	{
+				//		return;
+				//	}
+				//}
+
+				manager.Init();
+				gameObject.SetActive(false);
+			}
 		}
 	}
 
@@ -68,10 +98,54 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			return;
 		}
 
-		StartGame();
+		if (FromOnlineSetup)
+		{
+			OnlineGameStarted = true;
+			RefreshUIWrite();
+		}
+		else
+		{
+			StartLocalGame();
+		}
 	}
 
-	public void StartGame()
+	public void StartOnlineGame()
+	{
+		PhotonNetwork.CurrentRoom.IsOpen = false;
+
+		int playerCount = GetPlayerCount();
+		if (playerCount < 2)
+		{
+			return;
+		}
+
+		terrain.Init();
+		manager.Players = new List<Tank>();
+
+		float offset = terrain.MapWidth / (playerCount + 1);
+		int counter = 0;
+		for (int i = 0; i < PlayerDataList.Count; i++)
+		{
+			PlayerSetup playerData = PlayerDataList[i];
+			if (playerData.Active.activeInHierarchy)
+			{
+				if (playerData.OnlineNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+				{
+					Vector3 position = new Vector3((counter + 1) * offset, 0f, 0f);
+					Tank tank = PhotonNetwork.Instantiate(TankPrefab.name, position, Quaternion.identity).GetComponent<Tank>();
+					tank.transform.parent = TankParent;
+					tank.Init(playerData.GetName(), counter, playerData.GetColor(), Tank.ControlType.LocalPlayer);
+					manager.Players.Add(tank);
+				}
+				counter++;
+			}
+		}
+
+		WaitingForOthersToStart = true;
+		NumLoadedTanks = 1;
+	}
+
+	public void StartLocalGame()
 	{
 		int playerCount = GetPlayerCount();
 		if (playerCount < 2)
@@ -107,6 +181,8 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	{
 		if (FromOnlineSetup)
 		{
+			NumLoadedTanks = 0;
+			OnlineGameStarted = false;
 			PhotonNetwork.Disconnect();
 			MainMenuRef.gameObject.SetActive(true);
 		}
@@ -118,7 +194,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		gameObject.SetActive(false);
 	}
 
-	private int GetPlayerCount()
+	public int GetPlayerCount()
 	{
 		int activeCount = 0;
 		foreach (PlayerSetup player in PlayerDataList)
@@ -152,6 +228,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		}
 	}
 
+	// todo - convert these to use player data
 	public void RefreshUIWrite()
 	{
 		if (!FromOnlineSetup)
@@ -171,11 +248,24 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			hash.Add(prefix + "ControlType", (int)player.GetControlType());
 		}
 		hash.Add("TerrainType", TerrainType.value);
+		hash.Add("GameStarted", OnlineGameStarted);
 		PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 	}
 
 	public void RefreshUIRead(Hashtable hash)
 	{
+		// Sometimes get a random hash with only 253 as a key...
+		if (hash.Keys.Count == 1)
+		{
+			return;
+		}
+
+		if ((bool)hash["GameStarted"])
+		{
+			StartOnlineGame();
+			return;
+		}
+
 		for (int i = 0; i < PlayerDataList.Count; i++)
 		{
 			string prefix = "Player_" + i + "_";

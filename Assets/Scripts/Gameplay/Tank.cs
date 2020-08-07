@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tank : MonoBehaviour
+public class Tank : MonoBehaviour, IPunInstantiateMagicCallback
 {
 	public enum ControlType
 	{
@@ -12,7 +13,7 @@ public class Tank : MonoBehaviour
 		HardAI,
 		NetworkPlayer
 	}
-	private ControlType MyControlType;
+	public ControlType MyControlType;
 
 	public int OnlineNumber = -1;
 
@@ -121,6 +122,7 @@ public class Tank : MonoBehaviour
 		TurretSprite.color = color;
 		LumpSprite.color = color;
 
+		// AI setup
 		switch (controlType)
 		{
 			case ControlType.EasyAI:
@@ -446,5 +448,39 @@ public class Tank : MonoBehaviour
 		TrajectoryLine.SetPositions(trajectoryPoints.ToArray());
 	}
 
+	public void OnPhotonInstantiate(PhotonMessageInfo info)
+	{
+		manager = GameManager.GetReference();
+		terrain = Terrain.GetReference();
 
+		int actorNum = info.Sender.ActorNumber;
+		if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber)
+		{
+			return;
+		}
+
+		OnlineNumber = actorNum;
+
+		SetupGameMenu setup = SetupGameMenu.GetReference();
+		int playerCount = setup.GetPlayerCount();
+		float offset = terrain.MapWidth / (playerCount + 1);
+		int counter = 0;
+		for (int i = 0; i < setup.PlayerDataList.Count; i++)
+		{
+			PlayerSetup playerData = setup.PlayerDataList[i];
+			if (playerData.Active.activeInHierarchy)
+			{
+				if (playerData.OnlineNumber == OnlineNumber)
+				{
+					Vector3 position = new Vector3((counter + 1) * offset, 0f, 0f);
+					transform.parent = setup.TankParent;
+					Init(playerData.GetName(), counter, playerData.GetColor(), ControlType.NetworkPlayer);
+					manager.Players.Add(this);
+				}
+				counter++;
+			}
+		}
+
+		setup.NumLoadedTanks++;
+	}
 }
