@@ -41,7 +41,10 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	// Update is called once per frame
 	void Update()
 	{
-		TerrainType.interactable = PhotonNetwork.IsMasterClient;
+		if (FromOnlineSetup)
+		{
+			TerrainType.interactable = PhotonNetwork.IsMasterClient;
+		}
 	}
 
 	public void InitNetwork()
@@ -58,15 +61,19 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		}
 	}
 
-	public void StartGame()
+	public void StartGameButton()
 	{
-		if (!PhotonNetwork.IsMasterClient)
+		if (FromOnlineSetup && !PhotonNetwork.IsMasterClient)
 		{
 			return;
 		}
 
+		StartGame();
+	}
+
+	public void StartGame()
+	{
 		int playerCount = GetPlayerCount();
-		Debug.Log("count: " + playerCount);
 		if (playerCount < 2)
 		{
 			return;
@@ -75,17 +82,19 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		terrain.Init();
 		manager.Players = new List<Tank>();
 
-		float offset = terrain.MapWidth / 5;
+		float offset = terrain.MapWidth / (playerCount + 1);
+		int counter = 0;
 		for (int i = 0; i < PlayerDataList.Count; i++)
 		{
 			PlayerSetup playerData = PlayerDataList[i];
 			if (playerData.Active.activeInHierarchy)
 			{
 				Tank tank = Instantiate(TankPrefab, TankParent).GetComponent<Tank>(); // todo - init with photon
-				tank.transform.position = new Vector3((i + 1) * offset, 0f, 0f);
+				tank.transform.position = new Vector3((counter + 1) * offset, 0f, 0f);
 				Tank.ControlType controlType = playerData.GetControlType();
-				tank.Init(playerData.GetName(), i, playerData.GetColor(), controlType);
+				tank.Init(playerData.GetName(), counter, playerData.GetColor(), controlType);
 				manager.Players.Add(tank);
+				counter++;
 			}
 		}
 
@@ -145,6 +154,11 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 	public void RefreshUIWrite()
 	{
+		if (!FromOnlineSetup)
+		{
+			return;
+		}
+
 		Hashtable hash = new Hashtable();
 		for (int i = 0; i < PlayerDataList.Count; i++)
 		{

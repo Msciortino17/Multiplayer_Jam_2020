@@ -4,15 +4,30 @@ using UnityEngine;
 
 public class Sandstorm : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	public ParticleSystem LeftWind;
+	public ParticleSystem RightWind;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	// Start is called before the first frame update
+	void Start()
+	{
+	}
+
+	public void UpdateWind(int direction)
+	{
+		if (direction == 0)
+		{
+			LeftWind.Stop();
+			RightWind.Stop();
+		}
+		else if (direction == -1)
+		{
+			LeftWind.Stop();
+			RightWind.Play();
+		}
+		else
+		{
+			LeftWind.Play();
+			RightWind.Stop();
+		}
+	}
 }

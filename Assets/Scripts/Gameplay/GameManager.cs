@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
 	static GameManager reference;
 
+	public Sandstorm SandstormRef;
 	public GameOverMenu GameOverRef;
 	public Text GameOverText;
 
@@ -126,8 +127,10 @@ public class GameManager : MonoBehaviour
 		WindTurns--;
 		if (WindTurns <= 0)
 		{
+			// Make these into room properties
 			WindDirection = Random.Range(-1, 2);
 			WindTurns = Random.Range(1, 4);
+			SandstormRef.UpdateWind(WindDirection);
 		}
 	}
 }
