@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerSetup : MonoBehaviour
 {
@@ -18,17 +19,22 @@ public class PlayerSetup : MonoBehaviour
 
 	public GameObject Active;
 	public GameObject Inactive;
+	public Button RemoveButton;
+	public Button AddButton;
 
 	// Start is called before the first frame update
 	void Start()
 	{
 		MyColorDisplay.color = GetColor();
+		RemoveButton.gameObject.SetActive(!SetupGameRef.FromOnlineSetup);
+		AddButton.gameObject.SetActive(!SetupGameRef.FromOnlineSetup);
+		NameField.readOnly = SetupGameRef.FromOnlineSetup;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-
+		MyControlType.interactable = (OnlineNumber == PhotonNetwork.LocalPlayer.ActorNumber);
 	}
 
 	public string GetName()
@@ -58,21 +64,43 @@ public class PlayerSetup : MonoBehaviour
 
 	public void NextColor()
 	{
+		if (OnlineNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+		{
+			return;
+		}
+
 		MyColor++;
 		if (MyColor == SetupGameRef.ColorOptions.Count)
 		{
 			MyColor = 0;
 		}
+
+		//Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+		//hash["Player_" + PlayerNumber + "_Color"] = MyColor;
+		//PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+		SetupGameRef.RefreshUIWrite();
+
 		MyColorDisplay.color = GetColor();
 	}
 
 	public void PrevColor()
 	{
+		if (OnlineNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+		{
+			return;
+		}
+
 		MyColor--;
 		if (MyColor == -1)
 		{
 			MyColor = SetupGameRef.ColorOptions.Count - 1;
 		}
+
+		//Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+		//hash["Player_" + PlayerNumber + "_Color"] = MyColor;
+		//PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+		SetupGameRef.RefreshUIWrite();
+
 		MyColorDisplay.color = GetColor();
 	}
 
@@ -88,7 +116,7 @@ public class PlayerSetup : MonoBehaviour
 
 	public void Remove()
 	{
-		if (SetupGameRef.FromOnlineSetup)
+		if (OnlineNumber == PhotonNetwork.LocalPlayer.ActorNumber && SetupGameRef.FromOnlineSetup)
 		{
 			SetupGameRef.Exit();
 			return;

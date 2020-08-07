@@ -826,6 +826,8 @@ MonoBehaviour:
   MyControlType: {fileID: 448575569}
   Active: {fileID: 894387282}
   Inactive: {fileID: 171830763}
+  RemoveButton: {fileID: 714750107}
+  AddButton: {fileID: 1112397931}
 --- !u!1 &120736495
 GameObject:
   m_ObjectHideFlags: 0
@@ -2006,7 +2008,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1983002551}
         m_MethodName: PrevColor
         m_Mode: 1
         m_Arguments:
@@ -2617,7 +2619,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 638601521}
+        m_MethodName: RefreshUIWrite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &227283936
 MonoBehaviour:
@@ -9213,7 +9226,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 506137423}
         m_MethodName: NextColor
         m_Mode: 1
         m_Arguments:
@@ -9928,7 +9941,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 638601521}
+        m_MethodName: RefreshUIWrite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!224 &448575570
 RectTransform:
@@ -10278,6 +10302,8 @@ MonoBehaviour:
   MyControlType: {fileID: 899643819}
   Active: {fileID: 727150719}
   Inactive: {fileID: 612841582}
+  RemoveButton: {fileID: 410991111}
+  AddButton: {fileID: 1338659423}
 --- !u!1 &512367736
 GameObject:
   m_ObjectHideFlags: 0
@@ -11001,7 +11027,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 638601521}
+        m_MethodName: RefreshUIWrite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!224 &591082156
 RectTransform:
@@ -11621,6 +11658,7 @@ MonoBehaviour:
   - {r: 0, g: 1, b: 1, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: 0, g: 0, b: 0, a: 1}
+  TerrainType: {fileID: 1252231726}
   TankParent: {fileID: 1964814383}
   TankPrefab: {fileID: 1019761205506631155, guid: bd13a8a0e04b3a547ace3c6eb57c14d3,
     type: 3}
@@ -11643,7 +11681,7 @@ MonoBehaviour:
   Synchronization: 0
   OwnershipTransfer: 0
   ObservedComponents: []
-  viewIdField: 2
+  viewIdField: 4
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &640568044
@@ -12873,6 +12911,8 @@ MonoBehaviour:
   MyControlType: {fileID: 591082155}
   Active: {fileID: 1947562107}
   Inactive: {fileID: 162848372}
+  RemoveButton: {fileID: 1397428649}
+  AddButton: {fileID: 582100861}
 --- !u!1 &760295257
 GameObject:
   m_ObjectHideFlags: 0
@@ -13308,7 +13348,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 758318991}
         m_MethodName: NextColor
         m_Mode: 1
         m_Arguments:
@@ -13968,7 +14008,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 638601521}
+        m_MethodName: RefreshUIWrite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!224 &899643820
 RectTransform:
@@ -17192,7 +17243,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 758318991}
         m_MethodName: PrevColor
         m_Mode: 1
         m_Arguments:
@@ -17810,7 +17861,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 638601521}
+        m_MethodName: RefreshUIWrite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &1252231727
 MonoBehaviour:
@@ -23902,7 +23964,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 506137423}
         m_MethodName: PrevColor
         m_Mode: 1
         m_Arguments:
@@ -25217,7 +25279,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 115705105}
         m_MethodName: NextColor
         m_Mode: 1
         m_Arguments:
@@ -25324,6 +25386,8 @@ MonoBehaviour:
   MyControlType: {fileID: 227283935}
   Active: {fileID: 212710375}
   Inactive: {fileID: 429582976}
+  RemoveButton: {fileID: 1565571545}
+  AddButton: {fileID: 1138386896}
 --- !u!1 &1995690361
 GameObject:
   m_ObjectHideFlags: 0
@@ -25713,7 +25777,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1983002551}
         m_MethodName: NextColor
         m_Mode: 1
         m_Arguments:
@@ -26585,7 +26649,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 115705105}
         m_MethodName: PrevColor
         m_Mode: 1
         m_Arguments:

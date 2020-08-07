@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using System.IO;
@@ -18,6 +19,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	public GameObject OnlinePlayerDataPrefab;
 	public List<PlayerSetup> PlayerDataList;
 	public List<Color> ColorOptions;
+	public Dropdown TerrainType;
 
 	private Terrain terrain;
 	private GameManager manager;
@@ -39,6 +41,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	// Update is called once per frame
 	void Update()
 	{
+		TerrainType.interactable = PhotonNetwork.IsMasterClient;
 	}
 
 	public void InitNetwork()
@@ -47,16 +50,21 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 		if (PhotonNetwork.IsMasterClient)
 		{
-			RefreshUIHost();
+			RefreshUIWrite();
 		}
 		else
 		{
-			RefreshUIClient(PhotonNetwork.CurrentRoom.CustomProperties);
+			RefreshUIRead(PhotonNetwork.CurrentRoom.CustomProperties);
 		}
 	}
 
 	public void StartGame()
 	{
+		if (!PhotonNetwork.IsMasterClient)
+		{
+			return;
+		}
+
 		int playerCount = GetPlayerCount();
 		Debug.Log("count: " + playerCount);
 		if (playerCount < 2)
@@ -128,35 +136,14 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
 		Debug.Log("someone else joined room");
-		// Send update to everyone else here
-		/**
-		 * For each PlayerSetup:
-		 * -If it's active
-		 * -The online number
-		 * -The nick name
-		 * -The color
-		 * -The control type
-		 */
 		if (PhotonNetwork.IsMasterClient)
 		{
 			PlayerJoinedroom(newPlayer);
-			RefreshUIHost();
-			//PlayerSetupInfo[] playerInfo = new PlayerSetupInfo[4];
-			//for (int i = 0; i < PlayerDataList.Count; i++)
-			//{
-			//	PlayerSetup player = PlayerDataList[i];
-			//	playerInfo[i].IsActive = player.Active.activeInHierarchy;
-			//	playerInfo[i].OnlineNumber = player.OnlineNumber;
-			//	playerInfo[i].NickNameSize = player.GetName().Length;
-			//	playerInfo[i].NickName = player.GetName();
-			//	playerInfo[i].Color = player.MyColor;
-			//	playerInfo[i].ControlType = (int)player.GetControlType();
-			//}
-			//photonView.RPC("RefreshUIData", RpcTarget.Others, playerInfo);
+			RefreshUIWrite();
 		}
 	}
 
-	private void RefreshUIHost()
+	public void RefreshUIWrite()
 	{
 		Hashtable hash = new Hashtable();
 		for (int i = 0; i < PlayerDataList.Count; i++)
@@ -169,10 +156,11 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			hash.Add(prefix + "Color", player.MyColor);
 			hash.Add(prefix + "ControlType", (int)player.GetControlType());
 		}
+		hash.Add("TerrainType", TerrainType.value);
 		PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 	}
 
-	public void RefreshUIClient(Hashtable hash)
+	public void RefreshUIRead(Hashtable hash)
 	{
 		for (int i = 0; i < PlayerDataList.Count; i++)
 		{
@@ -199,11 +187,20 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			player.MyColorDisplay.color = player.GetColor();
 			player.SetControlType((Tank.ControlType)controlType);
 		}
+		TerrainType.value = (int)hash["TerrainType"];
 	}
 
 	public override void OnRoomPropertiesUpdate(Hashtable hash)
 	{
-		RefreshUIClient(hash);
+		RefreshUIRead(hash);
+	}
+
+	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		if (PhotonNetwork.IsMasterClient)
+		{
+			PlayerLeftRoom(otherPlayer);
+		}
 	}
 
 	public void PlayerJoinedroom(Player newPlayer)
@@ -216,6 +213,21 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 				player.OnlineNumber = newPlayer.ActorNumber;
 				player.SetName(newPlayer.NickName);
 				player.AddPlayer();
+				return;
+			}
+		}
+	}
+
+	public void PlayerLeftRoom(Player leavingPlayer)
+	{
+		for (int i = 0; i < PlayerDataList.Count; i++)
+		{
+			PlayerSetup player = PlayerDataList[i];
+			if (player.Active.activeInHierarchy && player.OnlineNumber == leavingPlayer.ActorNumber)
+			{
+				player.TurnOff();
+				player.OnlineNumber = -1;
+				RefreshUIWrite();
 				return;
 			}
 		}
