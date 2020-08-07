@@ -14,6 +14,8 @@ public class Tank : MonoBehaviour
 	}
 	private ControlType MyControlType;
 
+	public int OnlineNumber = -1;
+
 	private Terrain terrain;
 	private GameManager manager;
 

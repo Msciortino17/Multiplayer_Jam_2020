@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class MainMenu : MonoBehaviour
 {
 	// References
-	public GameObject SetupGameMenu;
+	public SetupGameMenu SetupGameMenuRef;
+	public SetupOnlineMenu SetupOnlineRef;
 	public OptionsMenu OptionsMenuRef;
 	public GameObject CreditsMenu;
 	public GameObject ExitButton;
@@ -29,7 +30,15 @@ public class MainMenu : MonoBehaviour
 
 	public void Play()
 	{
-		SetupGameMenu.SetActive(true);
+		SetupGameMenuRef.FromOnlineSetup = false;
+		SetupGameMenuRef.gameObject.SetActive(true);
+		gameObject.SetActive(false);
+	}
+
+	public void PlayOnline()
+	{
+		SetupOnlineRef.gameObject.SetActive(true);
+		SetupOnlineRef.Init();
 		gameObject.SetActive(false);
 	}
 

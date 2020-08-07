@@ -2,20 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class PlayerSetup : MonoBehaviour
 {
+	public int PlayerNumber;
+	public int OnlineNumber = -1;
+
 	public SetupGameMenu SetupGameRef;
-	public Image MyPortraitRef;
 	public InputField NameField;
 	public Image MyColorDisplay;
 	public int MyColor;
 	public Dropdown MyControlType;
 
+	public GameObject Active;
+	public GameObject Inactive;
+
 	// Start is called before the first frame update
 	void Start()
 	{
-		MyPortraitRef.color = GetColor();
 		MyColorDisplay.color = GetColor();
 	}
 
@@ -30,6 +36,11 @@ public class PlayerSetup : MonoBehaviour
 		return NameField.text;
 	}
 
+	public void SetName(string name)
+	{
+		NameField.text = name;
+	}
+
 	public Color GetColor()
 	{
 		return SetupGameRef.ColorOptions[MyColor];
@@ -40,6 +51,11 @@ public class PlayerSetup : MonoBehaviour
 		return (Tank.ControlType)MyControlType.value;
 	}
 
+	public void SetControlType(Tank.ControlType type)
+	{
+		MyControlType.value = (int)type;
+	}
+
 	public void NextColor()
 	{
 		MyColor++;
@@ -47,7 +63,6 @@ public class PlayerSetup : MonoBehaviour
 		{
 			MyColor = 0;
 		}
-		MyPortraitRef.color = GetColor();
 		MyColorDisplay.color = GetColor();
 	}
 
@@ -58,16 +73,39 @@ public class PlayerSetup : MonoBehaviour
 		{
 			MyColor = SetupGameRef.ColorOptions.Count - 1;
 		}
-		MyPortraitRef.color = GetColor();
 		MyColorDisplay.color = GetColor();
+	}
+
+	public void AddPlayer()
+	{
+		if (SetupGameRef.FromOnlineSetup && !PhotonNetwork.IsMasterClient)
+		{
+			return;
+		}
+
+		TurnOn();
 	}
 
 	public void Remove()
 	{
-		if (SetupGameRef.PlayerDataList.Count > 1)
+		if (SetupGameRef.FromOnlineSetup)
 		{
-			SetupGameRef.PlayerDataList.Remove(this);
-			Destroy(gameObject);
+			SetupGameRef.Exit();
+			return;
 		}
+
+		TurnOff();
+	}
+
+	public void TurnOn()
+	{
+		Active.SetActive(true);
+		Inactive.SetActive(false);
+	}
+
+	public void TurnOff()
+	{
+		Active.SetActive(false);
+		Inactive.SetActive(true);
 	}
 }
