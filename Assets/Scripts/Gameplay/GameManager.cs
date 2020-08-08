@@ -57,12 +57,19 @@ public class GameManager : MonoBehaviourPunCallbacks
 		CurrentPlayer = 0;
 		GetCurrentPlayer().StartTurn();
 
-		string message = "Account nums:";
-		for (int i = 0; i < PlayerTanks.Count; i++)
+		if (OnlineGame && PhotonNetwork.IsMasterClient)
 		{
-			message += "\nindex: " + i + ", Account num: " + PlayerTanks[i].OnlineNumber;
+			int windDirection = Random.Range(-1, 2);
+			int windTurns = Random.Range(1, 2);
+			SetWind(windDirection, windTurns);
 		}
-		Debug.Log(message);
+
+		//string message = "Account nums:";
+		//for (int i = 0; i < PlayerTanks.Count; i++)
+		//{
+		//	message += "\nindex: " + i + ", Account num: " + PlayerTanks[i].OnlineNumber;
+		//}
+		//Debug.Log(message);
 	}
 
 	private int CheckWinner()
@@ -131,19 +138,30 @@ public class GameManager : MonoBehaviourPunCallbacks
 		}
 		else
 		{
+			SetWind(0, 0);
+			SandstormRef.Stop();
 			GameOverRef.gameObject.SetActive(true);
 			GameOverText.text = "Game Over\n\nThe winner is " + PlayerTanks[winner].TankName;
 
 			// Clear out players
 			foreach (var player in PlayerTanks)
 			{
-				Destroy(player.gameObject);
+				if (OnlineGame)
+				{
+					if (player.OnlineNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+					{
+						PhotonNetwork.Destroy(player.gameObject);
+					}
+				}
+				else
+				{
+					Destroy(player.gameObject);
+				}
 			}
 			PlayerTanks.Clear();
 
 			Started = false;
 			SetupGameRef.Clear();
-			SetWind(0, 0);
 		}
 	}
 
@@ -164,6 +182,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 		WindTurns--;
 		if (WindTurns <= 0)
 		{
+			if (OnlineGame && !PhotonNetwork.IsMasterClient)
+			{
+				return;
+			}
+
 			int windDirection = Random.Range(-1, 2);
 			int windTurns = Random.Range(1, 2);
 			SetWind(windDirection, windTurns);
@@ -188,11 +211,14 @@ public class GameManager : MonoBehaviourPunCallbacks
 		}
 	}
 
-	public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+	public void UpdateWind()
 	{
-		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
-		WindDirection = (int)hash["WindDirection"];
-		WindTurns = (int)hash["WindTurns"];
-		SandstormRef.UpdateWind(WindDirection);
+		if (Started)
+		{
+			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+			WindDirection = (int)hash["WindDirection"];
+			WindTurns = (int)hash["WindTurns"];
+			SandstormRef.UpdateWind(WindDirection);
+		}
 	}
 }

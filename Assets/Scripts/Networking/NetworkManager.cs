@@ -67,7 +67,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	{
 		Hashtable schema = new Hashtable();
 
-		schema.Add("InLobby", true);
+		schema.Add("Ready", false);
+		schema.Add("Health", 100f);
+		schema.Add("Fuel", 100f);
 
 		player.SetCustomProperties(schema);
 	}
@@ -142,6 +144,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public override void OnJoinRandomFailed(short returnCode, string message)
 	{
 		Debug.Log("Failed to join a random room. Reason: " + message);
+	}
+
+	public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+	{
+		GameManager manager = GameManager.GetReference();
+		if (manager.Started)
+		{
+			manager.UpdateWind();
+		}
 	}
 
 	#endregion

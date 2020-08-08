@@ -281,6 +281,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MyControlType: 4
   OnlineNumber: -1
+  NetworkTimer: 0
   MyHoverText: {fileID: 8579105608568844467}
   MinMoveSpeed: 3
   MaxMoveSpeed: 7

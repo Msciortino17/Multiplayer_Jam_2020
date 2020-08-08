@@ -1,10 +1,11 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameOverMenu : MonoBehaviour
+public class GameOverMenu : MonoBehaviourPunCallbacks
 {
 	public MainMenu MainMenuRef;
 	public SetupGameMenu SetupGameRef;
@@ -26,8 +27,9 @@ public class GameOverMenu : MonoBehaviour
 		if (SetupGameRef.FromOnlineSetup)
 		{
 			Hashtable hashPlayer = PhotonNetwork.LocalPlayer.CustomProperties;
-			hashPlayer["InLobby"] = true;
+			hashPlayer["Ready"] = false;
 			PhotonNetwork.LocalPlayer.SetCustomProperties(hashPlayer);
+			SetupGameRef.RefreshUIRead();
 		}
 
 		SetupGameRef.gameObject.SetActive(true);
@@ -39,5 +41,14 @@ public class GameOverMenu : MonoBehaviour
 		SetupGameRef.Exit();
 		MainMenuRef.gameObject.SetActive(true);
 		gameObject.SetActive(false);
+	}
+
+	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		if (PhotonNetwork.IsMasterClient)
+		{
+			SetupGameRef.PlayerLeftRoom(otherPlayer);
+			SetupGameRef.RefreshUIWrite();
+		}
 	}
 }

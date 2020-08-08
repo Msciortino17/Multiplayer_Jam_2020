@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,7 +33,7 @@ public class Bullet : MonoBehaviour
 		Tank otherTank = other.GetComponent<Tank>();
 		if (otherTank != null)
 		{
-			otherTank.Health -= 50f;
+			otherTank.Health -= 40f;
 		}
 
 		Explode();

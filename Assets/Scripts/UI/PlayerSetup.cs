@@ -17,6 +17,7 @@ public class PlayerSetup : MonoBehaviour
 	public Image MyColorDisplay;
 	public int MyColor;
 	public Dropdown MyControlType;
+	public Text StatusText;
 
 	public GameObject Active;
 	public GameObject Inactive;
@@ -28,13 +29,14 @@ public class PlayerSetup : MonoBehaviour
 	{
 		MyColorDisplay.color = GetColor();
 		RemoveButton.gameObject.SetActive(!SetupGameRef.FromOnlineSetup);
-		AddButton.gameObject.SetActive(!SetupGameRef.FromOnlineSetup);
+		StatusText.gameObject.SetActive(SetupGameRef.FromOnlineSetup);
 		NameField.readOnly = SetupGameRef.FromOnlineSetup;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
+		AddButton.gameObject.SetActive(!SetupGameRef.FromOnlineSetup);
 		MyControlType.interactable = (OnlineNumber == PhotonNetwork.LocalPlayer.ActorNumber);
 	}
 

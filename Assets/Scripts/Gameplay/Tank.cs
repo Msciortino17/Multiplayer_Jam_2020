@@ -1,9 +1,11 @@
-﻿using Photon.Pun;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
@@ -19,6 +21,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 	public int OnlineNumber = -1;
 	public Player MyPlayer;
+	public float NetworkTimer;
 	public Text MyHoverText;
 
 	private Terrain terrain;
@@ -74,6 +77,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	void Start()
 	{
 		TrajectoryLine.positionCount = NumTrajectoryPoints;
+		MyHoverText.text = TankName + " : " + OnlineNumber + "\nHealth: " + Health.ToString("0.00");
 	}
 
 	// Update is called once per frame
@@ -81,14 +85,27 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	{
 		if (MyTurn)
 		{
+			MyHoverText.text = TankName + " : " + OnlineNumber + "\nHealth: " + Health.ToString("0.00");
 			if (MyControlType == ControlType.LocalPlayer)
 			{
 				HorizontalInput();
 				TurretInput();
+				//if (NetworkTimer <= 0f)
+				//{
+				//	if (PhotonNetwork.LocalPlayer == MyPlayer)
+				//	{
+				//		WriteFuelSettings();
+				//	}
+				//	if (PhotonNetwork.IsMasterClient)
+				//	{
+				//		WriteHealthSettings();
+				//	}
+				//	NetworkTimer = 0.25f;
+				//}
+				MyHoverText.text += "\nFuel: " + Fuel.ToString("0.00");
 			}
 			else if (MyControlType == ControlType.NetworkPlayer)
 			{
-				// todo
 			}
 			else
 			{
@@ -99,7 +116,10 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			AdjustAngle();
 		}
 
-		MyHoverText.text = TankName + " : " + OnlineNumber + "\n" + ", Health: " + Health.ToString("0.00") + "\nFuel: " + Fuel.ToString("0.00");
+		if (Health <= 0f)
+		{
+			MyHoverText.text = TankName + " RIP";
+		}
 	}
 
 	void OnCollisionEnter(Collision collision)
@@ -466,6 +486,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		terrain = Terrain.GetReference();
 
 		int actorNum = info.Sender.ActorNumber;
+		MyPlayer = info.Sender;
 		OnlineNumber = actorNum;
 		terrain.Init();
 		if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber)
@@ -488,7 +509,6 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 					transform.parent = setup.TankParent;
 					Init(playerData.GetName(), counter, playerData.GetColor(), ControlType.NetworkPlayer);
 					manager.PlayerTanks.Add(this);
-					Debug.Log("hello???");
 				}
 				counter++;
 			}
@@ -496,4 +516,49 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		setup.NumLoadedTanks++;
 	}
+
+	//public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+	//{
+	//	ReadHealthSettings();
+	//	ReadFuelSettings();
+	//	MyHoverText.text = TankName + " : " + OnlineNumber + "\nHealth: " + Health.ToString("0.00") + "\nFuel: " + Fuel.ToString("0.00");
+	//}
+
+	//public void ReadHealthSettings()
+	//{
+	//	if (manager.OnlineGame)
+	//	{
+	//		Hashtable hash = MyPlayer.CustomProperties;
+	//		Health = (float)hash["Health"];
+	//	}
+	//}
+
+	//public void WriteHealthSettings()
+	//{
+	//	if (manager.OnlineGame)
+	//	{
+	//		Hashtable hash = MyPlayer.CustomProperties;
+	//		hash["Health"] = Health;
+	//		MyPlayer.SetCustomProperties(hash);
+	//	}
+	//}
+
+	//public void ReadFuelSettings()
+	//{
+	//	if (manager.OnlineGame)
+	//	{
+	//		Hashtable hash = MyPlayer.CustomProperties;
+	//		Fuel = (float)hash["Fuel"];
+	//	}
+	//}
+
+	//public void WriteFuelSettings()
+	//{
+	//	if (manager.OnlineGame)
+	//	{
+	//		Hashtable hash = MyPlayer.CustomProperties;
+	//		hash["Fuel"] = Fuel;
+	//		MyPlayer.SetCustomProperties(hash);
+	//	}
+	//}
 }
