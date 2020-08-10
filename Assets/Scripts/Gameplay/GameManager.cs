@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 		CurrentPlayer = 0;
 		GetCurrentPlayer().StartTurn();
 
-		if (OnlineGame && PhotonNetwork.IsMasterClient)
+		if (!OnlineGame || PhotonNetwork.IsMasterClient)
 		{
 			int windDirection = Random.Range(-1, 2);
 			int windTurns = Random.Range(1, 2);

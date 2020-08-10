@@ -1,11 +1,13 @@
 ﻿using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Random = UnityEngine.Random;
 
 public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 {
@@ -47,10 +49,11 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public float Fuel;
 	public float FuelConsumption;
 
-	// Color stuff
-	public SpriteRenderer ChasisSprite;
-	public SpriteRenderer TurretSprite;
-	public SpriteRenderer LumpSprite;
+	// Visual effect stuff
+	public List<TankWheel> MyWheels;
+	public float MinWheelSpin;
+	public float MaxWheelSpin;
+	public float PrevX;
 
 	// Trajectory preview
 	public LineRenderer TrajectoryLine;
@@ -78,6 +81,11 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	{
 		TrajectoryLine.positionCount = NumTrajectoryPoints;
 		MyHoverText.text = TankName + " : " + OnlineNumber + "\nHealth: " + Health.ToString("0.00");
+
+		MyWheels = new List<TankWheel>();
+		MyWheels.AddRange(GetComponentsInChildren<TankWheel>());
+
+		PrevX = transform.position.x;
 	}
 
 	// Update is called once per frame
@@ -90,18 +98,6 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			{
 				HorizontalInput();
 				TurretInput();
-				//if (NetworkTimer <= 0f)
-				//{
-				//	if (PhotonNetwork.LocalPlayer == MyPlayer)
-				//	{
-				//		WriteFuelSettings();
-				//	}
-				//	if (PhotonNetwork.IsMasterClient)
-				//	{
-				//		WriteHealthSettings();
-				//	}
-				//	NetworkTimer = 0.25f;
-				//}
 				MyHoverText.text += "\nFuel: " + Fuel.ToString("0.00");
 			}
 			else if (MyControlType == ControlType.NetworkPlayer)
@@ -119,6 +115,25 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		if (Health <= 0f)
 		{
 			MyHoverText.text = TankName + " RIP";
+		}
+
+		SpinWheels();
+		PrevX = transform.position.x;
+	}
+
+	private void SpinWheels()
+	{
+		float delta = (transform.position.x - PrevX);
+		if (Mathf.Abs(delta) > 0f)
+		{
+			float slope = terrain.GetSlopeAtX(transform.position.x);
+			slope = (slope + 1) * 0.5f;
+			float spinSpeed = Mathf.Lerp(MinWheelSpin, MaxWheelSpin, slope);
+
+			foreach (TankWheel wheel in MyWheels)
+			{
+				wheel.Spin(spinSpeed);
+			}
 		}
 	}
 
@@ -142,9 +157,14 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		IDNumber = id;
 		MyControlType = controlType;
 
-		ChasisSprite.color = color;
-		TurretSprite.color = color;
-		LumpSprite.color = color;
+		//ChasisSprite.color = color;
+		//TurretSprite.color = color;
+		//LumpSprite.color = color;
+		ColorSetter[] colorSetters = GetComponentsInChildren<ColorSetter>();
+		for (int i = 0; i < colorSetters.Length; i++)
+		{
+			colorSetters[i].SetColor(color);
+		}
 
 		// AI setup
 		switch (controlType)
@@ -197,6 +217,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			AI_aimTimer = AI_aimTime;
 			AI_rotateDirection = Random.Range(0, 2) == 0 ? -1 : 1;
 		}
+
+		//ZoomedView.GetReference().StartFollowing(transform);
 	}
 
 	private void HorizontalInput()
@@ -233,6 +255,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		if (Input.GetKey(KeyCode.Space))
 		{
 			UpdateTrajectory();
+			//ZoomedView.GetReference().ReturnToStandard();
 		}
 
 		if (Input.GetKeyUp(KeyCode.Space))
@@ -240,7 +263,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			TrajectoryLine.gameObject.SetActive(false);
 			if (OnlineNumber == -1)
 			{
-				FireBullet();
+				GameObject bullet = FireBullet();
+				//ZoomedView.GetReference().StartFollowing(bullet.transform);
 			}
 			else
 			{
@@ -353,7 +377,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	}
 
 	[PunRPC]
-	private void FireBullet()
+	private GameObject FireBullet()
 	{
 		// Setup the bullet
 		GameObject bullet = Instantiate(BulletPrefab);
@@ -365,6 +389,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		// End turn
 		manager.NextPlayer();
+		return bullet;
 	}
 
 	private bool ShouldHitSomething(float radius, float tempo, int checks)
