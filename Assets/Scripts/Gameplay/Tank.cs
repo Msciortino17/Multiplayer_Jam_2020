@@ -54,6 +54,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public float MinWheelSpin;
 	public float MaxWheelSpin;
 	public float PrevX;
+	private List<Crosshair> CrossHairs;
+	public GameObject CrossHairParent;
 
 	// Trajectory preview
 	public LineRenderer TrajectoryLine;
@@ -84,6 +86,9 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		MyWheels = new List<TankWheel>();
 		MyWheels.AddRange(GetComponentsInChildren<TankWheel>());
+
+		CrossHairs = new List<Crosshair>();
+		CrossHairs.AddRange(CrossHairParent.GetComponentsInChildren<Crosshair>());
 
 		PrevX = transform.position.x;
 	}
@@ -250,18 +255,21 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			TrajectoryLine.gameObject.SetActive(true);
+			//TrajectoryLine.gameObject.SetActive(true);
+			CrossHairParent.gameObject.SetActive(true);
 		}
 
 		if (Input.GetKey(KeyCode.Space))
 		{
-			UpdateTrajectory();
+			//UpdateTrajectory();
+			UpdateCrossHairs();
 			//ZoomedView.GetReference().ReturnToStandard();
 		}
 
 		if (Input.GetKeyUp(KeyCode.Space))
 		{
-			TrajectoryLine.gameObject.SetActive(false);
+			//TrajectoryLine.gameObject.SetActive(false);
+			CrossHairParent.gameObject.SetActive(false);
 			if (OnlineNumber == -1)
 			{
 				GameObject bullet = FireBullet();
@@ -283,7 +291,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			if (Mathf.Abs(toGoal) < 0.1f)
 			{
 				AI_moving = false;
-				TrajectoryLine.gameObject.SetActive(true);
+				//TrajectoryLine.gameObject.SetActive(true);
 			}
 			else if (toGoal < 0f || toGoal > terrain.MapWidth * 0.5f)
 			{
@@ -294,7 +302,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 				else
 				{
 					AI_moving = false;
-					TrajectoryLine.gameObject.SetActive(true);
+					//TrajectoryLine.gameObject.SetActive(true);
 				}
 			}
 			else if (toGoal > 0f || toGoal < -terrain.MapWidth * 0.5f)
@@ -306,20 +314,20 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 				else
 				{
 					AI_moving = false;
-					TrajectoryLine.gameObject.SetActive(true);
+					//TrajectoryLine.gameObject.SetActive(true);
 				}
 			}
 			if (Fuel <= 0f)
 			{
 				AI_moving = false;
-				TrajectoryLine.gameObject.SetActive(true);
+				//TrajectoryLine.gameObject.SetActive(true);
 			}
 		}
 		else
 		{
 			if (AI_aimTimer > 0f)
 			{
-				UpdateTrajectory();
+				//UpdateTrajectory();
 				AI_aimTimer -= Time.deltaTime;
 
 				FlailTurret();
@@ -504,6 +512,43 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		}
 
 		TrajectoryLine.SetPositions(trajectoryPoints.ToArray());
+	}
+
+	private void UpdateCrossHairs()
+	{
+		Vector3 bulletVector = Lump.position - TurretPivot.position;
+		bulletVector.Normalize();
+		bulletVector *= BulletPower;
+
+		List<Vector3> trajectoryPoints = new List<Vector3>();
+		Vector3 currentPoint = Lump.transform.position;
+		for (int i = 0; i < NumTrajectoryPoints; i++)
+		{
+			trajectoryPoints.Add(currentPoint);
+
+			currentPoint += bulletVector * TrajectoryTempo;
+			bulletVector += Physics.gravity * TrajectoryTempo;
+			bulletVector += manager.GetWind() * TrajectoryTempo;
+
+			if (terrain.GetHeightAtX(currentPoint.x) > currentPoint.y)
+			{
+				break;
+			}
+		}
+
+		int halfWay = (int)(trajectoryPoints.Count * 0.5f);
+		int spaceBetween = (int)(trajectoryPoints.Count * 0.05f) + 1;
+		for (int i = 0; i < CrossHairs.Count; i++)
+		{
+			Crosshair crosshair = CrossHairs[i];
+			int index = (i * spaceBetween) + halfWay;
+			if (index >= trajectoryPoints.Count)
+			{
+				index = trajectoryPoints.Count - 1;
+			}
+			crosshair.transform.position = trajectoryPoints[(i * spaceBetween) + halfWay];
+			crosshair.WrapWorld(terrain);
+		}
 	}
 
 	public void OnPhotonInstantiate(PhotonMessageInfo info)
