@@ -9,6 +9,7 @@ using System;
 using System.Text;
 using ExitGames.Client.Photon;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Random = UnityEngine.Random;
 
 public class SetupGameMenu : MonoBehaviourPunCallbacks
 {
@@ -199,7 +200,8 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		OnlineGameStarted = true;
 		PhotonNetwork.CurrentRoom.IsOpen = false;
 
-		terrain.Init(TerrainType.value);
+		float seed = (float)PhotonNetwork.CurrentRoom.CustomProperties["TerrainSeed"];
+		terrain.Init(TerrainType.value, seed);
 
 		int playerCount = GetPlayerCount();
 		float offset = terrain.MapWidth / (playerCount + 1);
@@ -233,7 +235,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			return;
 		}
 
-		terrain.Init(TerrainType.value);
+		terrain.Init(TerrainType.value, Random.Range(0f, 10f));
 		manager.PlayerTanks = new List<Tank>();
 
 		float offset = terrain.MapWidth / (playerCount + 1);
@@ -377,6 +379,13 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
 	{
 		RefreshUIRead();
+	}
+
+	public override void OnCreatedRoom()
+	{
+		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+		hash["TerrainSeed"] = Random.Range(0f, 10f);
+		PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 	}
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)

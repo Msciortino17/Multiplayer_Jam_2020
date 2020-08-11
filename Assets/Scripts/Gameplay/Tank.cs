@@ -58,6 +58,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public float PrevX;
 	private List<Crosshair> CrossHairs;
 	public GameObject CrossHairParent;
+	public ParticleSystem DustParticles;
 
 	// Trajectory preview
 	public LineRenderer TrajectoryLine;
@@ -490,6 +491,9 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			transform.position = position;
 			AdjustHeight();
 		}
+
+		bool useDust = (transform.position.x < terrain.MapWidth * 0.99f && transform.position.x > 0.1f);
+		DustParticles.gameObject.SetActive(useDust);
 	}
 
 	private void AdjustHeight()
@@ -559,7 +563,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			{
 				index = trajectoryPoints.Count - 1;
 			}
-			crosshair.transform.position = trajectoryPoints[(i * spaceBetween) + halfWay];
+			crosshair.transform.position = trajectoryPoints[index];
 			crosshair.WrapWorld(terrain);
 		}
 	}
@@ -572,7 +576,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		int actorNum = info.Sender.ActorNumber;
 		MyPlayer = info.Sender;
 		OnlineNumber = actorNum;
-		terrain.Init(SetupGameMenu.GetReference().TerrainType.value);
+		float seed = (float)PhotonNetwork.CurrentRoom.CustomProperties["TerrainSeed"];
+		terrain.Init(SetupGameMenu.GetReference().TerrainType.value, seed);
 		if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber)
 		{
 			return;

@@ -47,6 +47,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 		schema.Add("WindDirection", 0);
 		schema.Add("WindTurns", 0);
+		schema.Add("TerrainSeed", 0f);
 
 		for (int i = 0; i < 4; i++)
 		{

@@ -223,6 +223,7 @@ MonoBehaviour:
   MaxWheelSpin: 360
   PrevX: 0
   CrossHairParent: {fileID: 3991710854340818378}
+  DustParticles: {fileID: 396657742962702683}
   TrajectoryLine: {fileID: 1470291794178131096}
   NumTrajectoryPoints: 100
   TrajectoryTempo: 0.1
@@ -658,7 +659,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 4c9cd43cf3e62144a8b7317a902d24ce, type: 3}
   m_Color: {r: 1, g: 0.8423222, b: 0.4198113, a: 1}
   m_FlipX: 0
@@ -2960,6 +2961,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 10d81660f905ecd4e869e66a2c079d0a, type: 3}
+--- !u!198 &396657742962702683 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8529850207834632968, guid: 10d81660f905ecd4e869e66a2c079d0a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8350003080321124947}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8481593612384308392 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 456420454867322619, guid: 10d81660f905ecd4e869e66a2c079d0a,

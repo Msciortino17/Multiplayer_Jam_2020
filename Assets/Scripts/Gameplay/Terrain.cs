@@ -47,7 +47,7 @@ public class Terrain : MonoBehaviour
 		}
 	}
 
-	public void Init(int roughness)
+	public void Init(int roughness, float seed)
 	{
 		if (initialized)
 		{
@@ -59,7 +59,7 @@ public class Terrain : MonoBehaviour
 		heightMap = new float[NumPoints];
 
 		// todo - set seed
-		Seed = Random.Range(0f, 10f);
+		Seed = seed;
 		switch (roughness)
 		{
 			case 0:
@@ -175,12 +175,6 @@ public class Terrain : MonoBehaviour
 		if (p2 == NumPoints)
 		{
 			p2 = 0;
-		}
-
-		// problem
-		if (p1 < 0 || p1 >= NumPoints - 1)
-		{
-			Debug.Log("beeg x: " + x);
 		}
 
 		float width1 = p1 * DuneWidth;
