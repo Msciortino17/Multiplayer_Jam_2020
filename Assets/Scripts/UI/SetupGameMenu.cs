@@ -199,7 +199,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		OnlineGameStarted = true;
 		PhotonNetwork.CurrentRoom.IsOpen = false;
 
-		terrain.Init();
+		terrain.Init(TerrainType.value);
 
 		int playerCount = GetPlayerCount();
 		float offset = terrain.MapWidth / (playerCount + 1);
@@ -233,7 +233,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			return;
 		}
 
-		terrain.Init();
+		terrain.Init(TerrainType.value);
 		manager.PlayerTanks = new List<Tank>();
 
 		float offset = terrain.MapWidth / (playerCount + 1);
@@ -265,10 +265,8 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			PhotonNetwork.Disconnect();
 			MainMenuRef.gameObject.SetActive(true);
 		}
-		else
-		{
-			MainMenuRef.gameObject.SetActive(true);
-		}
+		MainMenuRef.gameObject.SetActive(true);
+		manager.EndGame();
 		ResetPlayerData();
 		gameObject.SetActive(false);
 	}

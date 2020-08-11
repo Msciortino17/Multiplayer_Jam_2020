@@ -117,6 +117,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			MyHoverText.text = TankName + " RIP";
 		}
 
+		MyHoverText.gameObject.SetActive(!manager.Paused);
 		SpinWheels();
 		PrevX = transform.position.x;
 	}
@@ -513,7 +514,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		int actorNum = info.Sender.ActorNumber;
 		MyPlayer = info.Sender;
 		OnlineNumber = actorNum;
-		terrain.Init();
+		terrain.Init(SetupGameMenu.GetReference().TerrainType.value);
 		if (actorNum == PhotonNetwork.LocalPlayer.ActorNumber)
 		{
 			return;

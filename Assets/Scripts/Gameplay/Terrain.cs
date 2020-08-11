@@ -18,6 +18,7 @@ public class Terrain : MonoBehaviour
 	public float GenFrequency;
 	public float GenAmplitude;
 	public float GenBottom;
+	public float Seed;
 
 	// Prefabs and references
 	public GameObject DunePrefab;
@@ -46,7 +47,7 @@ public class Terrain : MonoBehaviour
 		}
 	}
 
-	public void Init()
+	public void Init(int roughness)
 	{
 		if (initialized)
 		{
@@ -57,20 +58,26 @@ public class Terrain : MonoBehaviour
 		DuneWidth = MapWidth / NumPoints;
 		heightMap = new float[NumPoints];
 
-		GenerateTerrain();
+		// todo - set seed
+		Seed = Random.Range(0f, 10f);
+		switch (roughness)
+		{
+			case 0:
+				GenerateSmoothTerrain();
+				break;
+			case 1:
+				GenerateStandardTerrain();
+				break;
+			case 2:
+				GenerateRoughTerrain();
+				break;
+		}
+
 		SetupDunes();
 	}
 
 	private void GenerateTerrain()
 	{
-		// Simple line
-		//float height = 1f;
-		//for (int i = 0; i < NumPoints; i++)
-		//{
-		//	heightMap[i] = height;
-		//	height += 0.5f;
-		//}
-
 		// Sin wave
 		float t = 0f;
 		for (int i = 0; i < NumPoints; i++)
@@ -83,6 +90,50 @@ public class Terrain : MonoBehaviour
 			heightMap[i] = height;
 			t += 0.1f;
 		}
+	}
+
+	private void GenerateSmoothTerrain()
+	{
+		// Sin wave
+		float t = Seed;
+		for (int i = 0; i < NumPoints; i++)
+		{
+			float height = Mathf.Sin(t) + 5;
+			if (height < 1f)
+			{
+				height = 1f;
+			}
+			heightMap[i] = height;
+			t += 0.1f;
+		}
+	}
+
+	private void GenerateStandardTerrain()
+	{
+		// Sin wave
+		float t = Seed;
+		float t2 = Seed;
+		float t3 = Seed;
+		float frequency = 1f / MapWidth;
+		for (int i = 0; i < NumPoints; i++)
+		{
+			float height = 3f * Mathf.Sin(t * .5f) + 10;
+			height += Mathf.Sin(t2 * .75f);
+			height -= 2f * Mathf.Cos(t3);
+			if (height < 1f)
+			{
+				height = 1f;
+			}
+			heightMap[i] = height;
+			t += 0.1f;
+			t2 += 0.1f;
+			t3 += 0.1f;
+		}
+	}
+
+	private void GenerateRoughTerrain()
+	{
+
 	}
 
 	private void SetupDunes()

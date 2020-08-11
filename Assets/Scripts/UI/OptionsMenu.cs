@@ -9,7 +9,6 @@ public class OptionsMenu : MonoBehaviour
 
 	// References
 	public MainMenu MainMenuRef;
-	public ControlsMenu ControlsMenuRef;
 	public PauseMenu PauseMenuRef;
 	public Slider MusicSlider;
 	public Slider EffectSlider;
@@ -36,12 +35,6 @@ public class OptionsMenu : MonoBehaviour
 		return EffectSlider.value;
 	}
 
-	public void Controls()
-	{
-		ControlsMenuRef.gameObject.SetActive(true);
-		gameObject.SetActive(false);
-	}
-
 	public void Exit()
 	{
 		if (FromMainMenu)
@@ -50,7 +43,7 @@ public class OptionsMenu : MonoBehaviour
 		}
 		else
 		{
-			ControlsMenuRef.gameObject.SetActive(true);
+			PauseMenuRef.gameObject.SetActive(true);
 		}
 
 		gameObject.SetActive(false);

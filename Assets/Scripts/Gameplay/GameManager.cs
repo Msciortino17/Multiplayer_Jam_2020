@@ -10,9 +10,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
 	static GameManager reference;
 	public SetupGameMenu SetupGameRef;
+	public PauseMenu PauseMenuRef;
 
 	public bool OnlineGame;
 	public bool Started;
+	public bool Paused;
 
 	public Sandstorm SandstormRef;
 	public GameOverMenu GameOverRef;
@@ -48,11 +50,26 @@ public class GameManager : MonoBehaviourPunCallbacks
 			message += "\n" + GetCurrentPlayer().TankName + " : " + GetCurrentPlayer().OnlineNumber;
 			DebugText.SetText(message);
 		}
+
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			if (Paused)
+			{
+				Paused = false;
+				PauseMenuRef.Unpause();
+			}
+			else
+			{
+				Paused = true;
+				PauseMenuRef.gameObject.SetActive(true);
+			}
+		}
 	}
 
 	public void Init(bool online)
 	{
 		Started = true;
+		Paused = false;
 		OnlineGame = online;
 		CurrentPlayer = 0;
 		GetCurrentPlayer().StartTurn();
@@ -138,31 +155,40 @@ public class GameManager : MonoBehaviourPunCallbacks
 		}
 		else
 		{
-			SetWind(0, 0);
-			SandstormRef.Stop();
 			GameOverRef.gameObject.SetActive(true);
 			GameOverText.text = "Game Over\n\nThe winner is " + PlayerTanks[winner].TankName;
+			EndGame();
+		}
+	}
 
-			// Clear out players
-			foreach (var player in PlayerTanks)
+	public void EndGame()
+	{
+		SetWind(0, 0);
+		SandstormRef.Stop();
+
+		ClearPlayerObjects();
+
+		Started = false;
+		SetupGameRef.Clear();
+	}
+
+	public void ClearPlayerObjects()
+	{
+		foreach (var player in PlayerTanks)
+		{
+			if (OnlineGame)
 			{
-				if (OnlineGame)
+				if (player.OnlineNumber == PhotonNetwork.LocalPlayer.ActorNumber)
 				{
-					if (player.OnlineNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-					{
-						PhotonNetwork.Destroy(player.gameObject);
-					}
-				}
-				else
-				{
-					Destroy(player.gameObject);
+					PhotonNetwork.Destroy(player.gameObject);
 				}
 			}
-			PlayerTanks.Clear();
-
-			Started = false;
-			SetupGameRef.Clear();
+			else
+			{
+				Destroy(player.gameObject);
+			}
 		}
+		PlayerTanks.Clear();
 	}
 
 	/// <summary>
