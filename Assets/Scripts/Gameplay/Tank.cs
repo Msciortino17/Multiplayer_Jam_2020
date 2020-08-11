@@ -40,6 +40,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public GameObject BulletPrefab;
 	public Transform TurretPivot;
 	public Transform Lump;
+	private float FireDelayTimer;
+	private bool WaitingToFire;
 
 	// Game loop stuff
 	public int IDNumber;
@@ -96,10 +98,10 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	// Update is called once per frame
 	void Update()
 	{
+		MyHoverText.text = TankName + "\nHealth: " + Health.ToString("0.00");
 		if (MyTurn)
 		{
-			MyHoverText.text = TankName + " : " + OnlineNumber + "\nHealth: " + Health.ToString("0.00");
-			if (MyControlType == ControlType.LocalPlayer)
+			if (MyControlType == ControlType.LocalPlayer && !WaitingToFire)
 			{
 				HorizontalInput();
 				TurretInput();
@@ -120,6 +122,26 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		if (Health <= 0f)
 		{
 			MyHoverText.text = TankName + " RIP";
+		}
+
+		if (WaitingToFire)
+		{
+			FireDelayTimer -= Time.deltaTime;
+			if (FireDelayTimer <= 0f)
+			{
+				WaitingToFire = false;
+
+				// Setup the bullet
+				GameObject bullet = Instantiate(BulletPrefab);
+				Vector3 bulletVector = Lump.position - TurretPivot.position;
+				bulletVector.Normalize();
+				bulletVector *= BulletPower;
+				bullet.GetComponent<Bullet>().velocity = bulletVector;
+				bullet.transform.position = Lump.position;
+
+				// End turn
+				manager.NextPlayer();
+			}
 		}
 
 		MyHoverText.gameObject.SetActive(!manager.Paused);
@@ -272,7 +294,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			CrossHairParent.gameObject.SetActive(false);
 			if (OnlineNumber == -1)
 			{
-				GameObject bullet = FireBullet();
+				FireBullet();
 				//ZoomedView.GetReference().StartFollowing(bullet.transform);
 			}
 			else
@@ -386,19 +408,10 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	}
 
 	[PunRPC]
-	private GameObject FireBullet()
+	private void FireBullet()
 	{
-		// Setup the bullet
-		GameObject bullet = Instantiate(BulletPrefab);
-		Vector3 bulletVector = Lump.position - TurretPivot.position;
-		bulletVector.Normalize();
-		bulletVector *= BulletPower;
-		bullet.GetComponent<Bullet>().velocity = bulletVector;
-		bullet.transform.position = Lump.position;
-
-		// End turn
-		manager.NextPlayer();
-		return bullet;
+		WaitingToFire = true;
+		FireDelayTimer = 0.5f;
 	}
 
 	private bool ShouldHitSomething(float radius, float tempo, int checks)

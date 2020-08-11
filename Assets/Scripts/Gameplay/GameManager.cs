@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 	public bool OnlineGame;
 	public bool Started;
 	public bool Paused;
+	public int Winner;
 
 	public Sandstorm SandstormRef;
 	public GameOverMenu GameOverRef;
@@ -26,6 +27,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 	public int WindTurns;
 	public int WindDirection;
 	public float WindPower;
+
+	// Transitions
+	private bool WaitingToNextPlayer;
+	private bool WaitingToEndGame;
+	private float NextPlayerTimer;
+	private float EndGameTimer;
 
 	public static GameManager GetReference()
 	{
@@ -64,15 +71,59 @@ public class GameManager : MonoBehaviourPunCallbacks
 				PauseMenuRef.gameObject.SetActive(true);
 			}
 		}
+
+		if (WaitingToNextPlayer)
+		{
+			NextPlayerTimer -= Time.deltaTime;
+			if (NextPlayerTimer <= 0f)
+			{
+				WaitingToNextPlayer = false;
+
+				CurrentPlayer++;
+				if (CurrentPlayer == PlayerTanks.Count)
+				{
+					CurrentPlayer = 0;
+					NextTurn();
+				}
+
+				Winner = CheckWinner();
+				if (Winner == -1)
+				{
+					GetCurrentPlayer().StartTurn();
+				}
+				else
+				{
+					WaitingToEndGame = true;
+					EndGameTimer = 3f;
+					DebugText.SetText("Game Over!");
+				}
+			}
+		}
+
+		if (WaitingToEndGame)
+		{
+			EndGameTimer -= Time.deltaTime;
+			if (EndGameTimer <= 0f)
+			{
+				WaitingToEndGame = false;
+
+				GameOverRef.gameObject.SetActive(true);
+				GameOverText.text = "Game Over\n\nThe winner is " + PlayerTanks[Winner].TankName;
+				EndGame();
+			}
+		}
 	}
 
 	public void Init(bool online)
 	{
 		Started = true;
 		Paused = false;
+		WaitingToEndGame = false;
+		WaitingToNextPlayer = false;
 		OnlineGame = online;
 		CurrentPlayer = 0;
 		GetCurrentPlayer().StartTurn();
+		Winner = -1;
 
 		if (!OnlineGame || PhotonNetwork.IsMasterClient)
 		{
@@ -141,24 +192,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 	public void BulletLanded()
 	{
-		CurrentPlayer++;
-		if (CurrentPlayer == PlayerTanks.Count)
-		{
-			CurrentPlayer = 0;
-			NextTurn();
-		}
-
-		int winner = CheckWinner();
-		if (winner == -1)
-		{
-			GetCurrentPlayer().StartTurn();
-		}
-		else
-		{
-			GameOverRef.gameObject.SetActive(true);
-			GameOverText.text = "Game Over\n\nThe winner is " + PlayerTanks[winner].TankName;
-			EndGame();
-		}
+		WaitingToNextPlayer = true;
+		NextPlayerTimer = 0.5f;
 	}
 
 	public void EndGame()
@@ -170,6 +205,9 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 		Started = false;
 		SetupGameRef.Clear();
+
+		WaitingToEndGame = false;
+		WaitingToNextPlayer = false;
 	}
 
 	public void ClearPlayerObjects()
