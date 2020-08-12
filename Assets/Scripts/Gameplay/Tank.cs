@@ -37,7 +37,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public float MaxTurretAngle;
 	public float MinTurretAngle;
 	public float BulletPower;
-	public GameObject BulletPrefab;
+	public GameObject[] BulletPrefabs;
+	public int BulletType;
 	public Transform TurretPivot;
 	public Transform Lump;
 	private float FireDelayTimer;
@@ -59,6 +60,9 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	private List<Crosshair> CrossHairs;
 	public GameObject CrossHairParent;
 	public ParticleSystem DustParticles;
+	public TankGun GunSprite;
+	public ParticleSystem GunBlast;
+	public ParticleSystem GunSmoke;
 
 	// Trajectory preview
 	public LineRenderer TrajectoryLine;
@@ -132,8 +136,13 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			{
 				WaitingToFire = false;
 
+				// Fire Gun
+				GunSprite.FireGun();
+				GunBlast.Play();
+				GunSmoke.Play();
+
 				// Setup the bullet
-				GameObject bullet = Instantiate(BulletPrefab);
+				GameObject bullet = Instantiate(BulletPrefabs[BulletType]);
 				Vector3 bulletVector = Lump.position - TurretPivot.position;
 				bulletVector.Normalize();
 				bulletVector *= BulletPower;
@@ -181,6 +190,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		manager = GameManager.GetReference();
 		AdjustHeight();
 		AdjustAngle();
+
+		BulletType = 0;
 
 		TankName = name;
 		IDNumber = id;

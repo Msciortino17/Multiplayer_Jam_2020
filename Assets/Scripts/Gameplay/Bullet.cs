@@ -9,6 +9,10 @@ public class Bullet : MonoBehaviour
 	private GameManager manager;
 
 	public Vector3 velocity;
+	public ParticleSystem MyParticles;
+
+	public bool PrevUseParticles;
+	public float ParticleTimer;
 
 	// Start is called before the first frame update
 	void Start()
@@ -20,6 +24,15 @@ public class Bullet : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (ParticleTimer > 0f)
+		{
+			ParticleTimer -= Time.deltaTime;
+			if (ParticleTimer <= 0f)
+			{
+				MyParticles.Play();
+			}
+		}
+
 		transform.Translate(velocity * Time.deltaTime);
 		velocity += Physics.gravity * Time.deltaTime;
 		velocity += manager.GetWind() * Time.deltaTime;
@@ -51,6 +64,10 @@ public class Bullet : MonoBehaviour
 
 	private void Explode()
 	{
+		MyParticles.Stop();
+		MyParticles.gameObject.AddComponent<ParticleKiller>();
+		MyParticles.transform.parent = null;
+
 		Destroy(gameObject);
 		manager.BulletLanded();
 		// todo - cause different effects here depending on the bullet
@@ -71,5 +88,16 @@ public class Bullet : MonoBehaviour
 			position.x = terrain.MapWidth - 0.001f;
 			transform.position = position;
 		}
+
+		bool useParticles = (transform.position.x < terrain.MapWidth * 0.99f && transform.position.x > 0.1f);
+		if (!useParticles && PrevUseParticles)
+		{
+			MyParticles.Stop();
+		}
+		if (useParticles && !PrevUseParticles)
+		{
+			MyParticles.Play();
+		}
+		PrevUseParticles = useParticles;
 	}
 }
