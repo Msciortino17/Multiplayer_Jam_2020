@@ -24,6 +24,8 @@ public class Bullet : MonoBehaviour
 	public GameObject DirtParticlePrefab;
 	public GameObject ScatterBulletPrefab;
 
+	public AudioClip ExplosionSound;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -86,6 +88,9 @@ public class Bullet : MonoBehaviour
 			explosion.transform.position = transform.position;
 			explosion.transform.localScale = new Vector3(ExplosionRadius, ExplosionRadius, ExplosionRadius);
 			explosion.Damage = Damage;
+			AudioSource audio = explosion.GetComponent<AudioSource>();
+			audio.clip = ExplosionSound;
+			audio.Play();
 		}
 
 		Destroy(gameObject);

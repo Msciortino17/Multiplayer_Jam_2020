@@ -4908,3 +4908,4 @@ MonoBehaviour:
     type: 3}
   DirtParticlePrefab: {fileID: 0}
   ScatterBulletPrefab: {fileID: 0}
+  ExplosionSound: {fileID: 8300000, guid: 3e7214e0961ceab478ff063793584259, type: 3}

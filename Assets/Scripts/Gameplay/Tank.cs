@@ -57,12 +57,20 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public float MinWheelSpin;
 	public float MaxWheelSpin;
 	public float PrevX;
+	public float PrevTurretRot;
 	private List<Crosshair> CrossHairs;
 	public GameObject CrossHairParent;
 	public ParticleSystem DustParticles;
 	public TankGun GunSprite;
 	public ParticleSystem GunBlast;
 	public ParticleSystem GunSmoke;
+
+	// Audio
+	public float MovementVolume;
+	public float TurretVolume;
+	public AudioSource MovementAudio;
+	public AudioSource TurretAudio;
+	public AudioSource FireGunAudio;
 
 	// Trajectory preview
 	public LineRenderer TrajectoryLine;
@@ -98,6 +106,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		CrossHairs.AddRange(CrossHairParent.GetComponentsInChildren<Crosshair>());
 
 		PrevX = transform.position.x;
+		PrevTurretRot = TurretPivot.rotation.z;
 	}
 
 	// Update is called once per frame
@@ -137,6 +146,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 				WaitingToFire = false;
 
 				// Fire Gun
+				FireGunAudio.Play();
 				GunSprite.FireGun();
 				GunBlast.Play();
 				GunSmoke.Play();
@@ -155,14 +165,13 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		}
 
 		MyHoverText.gameObject.SetActive(!manager.Paused);
-		SpinWheels();
-		PrevX = transform.position.x;
+		MovementEffects();
 	}
 
-	private void SpinWheels()
+	private void MovementEffects()
 	{
-		float delta = (transform.position.x - PrevX);
-		if (Mathf.Abs(delta) > 0f)
+		float deltaX = (transform.position.x - PrevX);
+		if (Mathf.Abs(deltaX) > 0.0001f)
 		{
 			float slope = terrain.GetSlopeAtX(transform.position.x);
 			slope = (slope + 1) * 0.5f;
@@ -172,7 +181,38 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			{
 				wheel.Spin(spinSpeed);
 			}
+
+			if (MovementAudio.volume < MovementVolume)
+			{
+				MovementAudio.volume += Time.deltaTime;
+			}
 		}
+		else
+		{
+			if (MovementAudio.volume > 0f)
+			{
+				MovementAudio.volume -= Time.deltaTime;
+			}
+		}
+
+		float deltaRot = (TurretPivot.rotation.z - PrevTurretRot);
+		if (Mathf.Abs(deltaRot) > 0.0001f)
+		{
+			if (TurretAudio.volume < TurretVolume)
+			{
+				TurretAudio.volume += Time.deltaTime;
+			}
+		}
+		else
+		{
+			if (TurretAudio.volume > 0f)
+			{
+				TurretAudio.volume -= Time.deltaTime;
+			}
+		}
+
+		PrevX = transform.position.x;
+		PrevTurretRot = TurretPivot.rotation.z;
 	}
 
 	void OnCollisionEnter(Collision collision)
