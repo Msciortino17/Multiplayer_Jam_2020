@@ -14,6 +14,16 @@ public class Bullet : MonoBehaviour
 	public bool PrevUseParticles;
 	public float ParticleTimer;
 
+	public bool IsDrone;
+	public bool IsHyperSonic;
+	public bool IsScatter;
+	public bool SpawnExplosion;
+	public float Damage;
+	public int ExplosionRadius;
+	public GameObject ExplosionPrefab;
+	public GameObject DirtParticlePrefab;
+	public GameObject ScatterBulletPrefab;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -46,10 +56,12 @@ public class Bullet : MonoBehaviour
 		Tank otherTank = other.GetComponent<Tank>();
 		if (otherTank != null)
 		{
-			otherTank.Health -= 40f;
+			if (!SpawnExplosion)
+			{
+				otherTank.Health -= Damage;
+			}
+			Explode();
 		}
-
-		Explode();
 	}
 
 	private void CheckGround()
@@ -67,6 +79,14 @@ public class Bullet : MonoBehaviour
 		MyParticles.Stop();
 		MyParticles.gameObject.AddComponent<ParticleKiller>();
 		MyParticles.transform.parent = null;
+
+		if (SpawnExplosion)
+		{
+			BulletExplosion explosion = Instantiate(ExplosionPrefab).GetComponent<BulletExplosion>();
+			explosion.transform.position = transform.position;
+			explosion.transform.localScale = new Vector3(ExplosionRadius, ExplosionRadius, ExplosionRadius);
+			explosion.Damage = Damage;
+		}
 
 		Destroy(gameObject);
 		manager.BulletLanded();

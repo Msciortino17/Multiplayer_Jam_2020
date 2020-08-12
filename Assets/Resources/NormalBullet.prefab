@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 712672097738339530}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 1}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children: []
   m_Father: {fileID: 5495807823143105145}
   m_RootOrder: 1
@@ -4898,3 +4898,13 @@ MonoBehaviour:
   MyParticles: {fileID: 3308411065714697398}
   PrevUseParticles: 1
   ParticleTimer: 0.1
+  IsDrone: 0
+  IsHyperSonic: 0
+  IsScatter: 0
+  SpawnExplosion: 1
+  Damage: 40
+  ExplosionRadius: 1
+  ExplosionPrefab: {fileID: 6988215034798635393, guid: 027eaaf88a53f5444a8c0bea00a25a5f,
+    type: 3}
+  DirtParticlePrefab: {fileID: 0}
+  ScatterBulletPrefab: {fileID: 0}
