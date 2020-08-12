@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Sandstorm : MonoBehaviour
 {
+	CameraEffects cameraEffects;
+	DarkOverlay darkness;
 	public ParticleSystem LeftWind;
 	public ParticleSystem RightWind;
 	private AudioSource MyAudio;
@@ -13,6 +15,8 @@ public class Sandstorm : MonoBehaviour
 	void Start()
 	{
 		MyAudio = GetComponent<AudioSource>();
+		darkness = DarkOverlay.GetReference();
+		cameraEffects = CameraEffects.GetReference();
 	}
 
 	void Update()
@@ -32,15 +36,21 @@ public class Sandstorm : MonoBehaviour
 		CurrentDirection = direction;
 		if (direction == 0)
 		{
+			darkness.SetDarkness(0f);
+			cameraEffects.SetSandStorm(false);
 			Stop();
 		}
 		else if (direction == -1)
 		{
+			darkness.SetDarkness(0.35f);
+			cameraEffects.SetSandStorm(true);
 			LeftWind.Stop();
 			RightWind.Play();
 		}
 		else
 		{
+			darkness.SetDarkness(0.35f);
+			cameraEffects.SetSandStorm(true);
 			LeftWind.Play();
 			RightWind.Stop();
 		}

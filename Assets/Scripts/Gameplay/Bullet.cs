@@ -26,16 +26,22 @@ public class Bullet : MonoBehaviour
 
 	public AudioClip ExplosionSound;
 
+	CameraEffects cameraEffects;
+
 	// Start is called before the first frame update
 	void Start()
 	{
 		terrain = Terrain.GetReference();
 		manager = GameManager.GetReference();
+		cameraEffects = CameraEffects.GetReference();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
+		WrapWorld();
+		CheckGround();
+
 		if (ParticleTimer > 0f)
 		{
 			ParticleTimer -= Time.deltaTime;
@@ -48,9 +54,6 @@ public class Bullet : MonoBehaviour
 		transform.Translate(velocity * Time.deltaTime);
 		velocity += Physics.gravity * Time.deltaTime;
 		velocity += manager.GetWind() * Time.deltaTime;
-
-		WrapWorld();
-		CheckGround();
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -69,8 +72,8 @@ public class Bullet : MonoBehaviour
 	private void CheckGround()
 	{
 		Vector3 position = transform.position;
-		float ground = terrain.GetHeightAtX(position.x) + 0.5f;
-		if (position.y < ground - 1f)
+		float ground = terrain.GetHeightAtX(position.x);
+		if (position.y < ground )
 		{
 			Explode();
 		}
@@ -78,6 +81,7 @@ public class Bullet : MonoBehaviour
 
 	private void Explode()
 	{
+		cameraEffects.Shake(0.25f);
 		MyParticles.Stop();
 		MyParticles.gameObject.AddComponent<ParticleKiller>();
 		MyParticles.transform.parent = null;

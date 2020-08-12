@@ -20,6 +20,8 @@ public class MainMenu : MonoBehaviour
 		{
 			ExitButton.SetActive(false);
 		}
+
+		OptionsMenuRef.InitAudio();
 	}
 
 	// Update is called once per frame

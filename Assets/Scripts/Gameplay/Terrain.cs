@@ -14,14 +14,35 @@ public class Terrain : MonoBehaviour
 	public int NumPoints;
 	private float DuneWidth;
 
+	// Background data
+	private float[] bg1_heightMap;
+	private float bg1_DuneWidth;
+
+	private float[] bg2_heightMap;
+	private float bg2_DuneWidth;
+
 	// Generation params
 	public float GenFrequency;
 	public float GenAmplitude;
 	public float GenBottom;
 	public float Seed;
 
+	public int bg1_NumPoints;
+	public float bg1_GenFrequency;
+	public float bg1_GenAmplitude;
+	public float bg1_GenBottom;
+	public float bg1_Seed;
+
+	public int bg2_NumPoints;
+	public float bg2_GenFrequency;
+	public float bg2_GenAmplitude;
+	public float bg2_GenBottom;
+	public float bg2_Seed;
+
 	// Prefabs and references
 	public GameObject DunePrefab;
+	public GameObject DuneBackgroundPrefab;
+	public GameObject DuneBackground2Prefab;
 
 	public static Terrain GetReference()
 	{
@@ -58,7 +79,12 @@ public class Terrain : MonoBehaviour
 		DuneWidth = MapWidth / NumPoints;
 		heightMap = new float[NumPoints];
 
-		// todo - set seed
+		bg1_DuneWidth = MapWidth / bg1_NumPoints;
+		bg1_heightMap = new float[bg1_NumPoints];
+
+		bg2_DuneWidth = MapWidth / bg2_NumPoints;
+		bg2_heightMap = new float[bg2_NumPoints];
+
 		Seed = seed;
 		switch (roughness)
 		{
@@ -72,6 +98,10 @@ public class Terrain : MonoBehaviour
 				GenerateRoughTerrain();
 				break;
 		}
+
+		bg1_Seed = Random.Range(0, 360f);
+		bg2_Seed = Random.Range(0, 360f);
+		GenerateBackground();
 
 		SetupDunes();
 	}
@@ -88,6 +118,34 @@ public class Terrain : MonoBehaviour
 				height = 1f;
 			}
 			heightMap[i] = height;
+			t += 0.1f;
+		}
+	}
+
+	private void GenerateBackground()
+	{
+		// Sin wave
+		float t = bg1_Seed;
+		for (int i = 0; i < bg1_NumPoints; i++)
+		{
+			float height = bg1_GenAmplitude * Mathf.Sin(bg1_GenFrequency * t) + bg1_GenBottom;
+			if (height < 1f)
+			{
+				height = 1f;
+			}
+			bg1_heightMap[i] = height;
+			t += 0.1f;
+		}
+
+		float t2 = bg2_Seed;
+		for (int i = 0; i < bg2_NumPoints; i++)
+		{
+			float height = bg2_GenAmplitude * Mathf.Sin(bg2_GenFrequency * t) + bg2_GenBottom;
+			if (height < 1f)
+			{
+				height = 1f;
+			}
+			bg2_heightMap[i] = height;
 			t += 0.1f;
 		}
 	}
@@ -170,8 +228,25 @@ public class Terrain : MonoBehaviour
 		{
 			GameObject dune = Instantiate(DunePrefab, transform);
 			float height = heightMap[i];
-			dune.transform.position = new Vector3(i * DuneWidth, height * 0.5f, 0f);
+			dune.transform.position = new Vector3(i * DuneWidth, height * 0.5f + 0.2f, 0f);
 			dune.transform.localScale = new Vector3(DuneWidth, height, 1f);
+		}
+
+		// Background
+		for (int i = 0; i < bg1_NumPoints; i++)
+		{
+			GameObject dune = Instantiate(DuneBackgroundPrefab, transform);
+			float height = bg1_heightMap[i];
+			dune.transform.position = new Vector3(i * bg1_DuneWidth, height * 0.5f, 0f);
+			dune.transform.localScale = new Vector3(bg1_DuneWidth, height, 1f);
+		}
+
+		for (int i = 0; i < bg2_NumPoints; i++)
+		{
+			GameObject dune = Instantiate(DuneBackground2Prefab, transform);
+			float height = bg2_heightMap[i];
+			dune.transform.position = new Vector3(i * bg2_DuneWidth, height * 0.5f, 0f);
+			dune.transform.localScale = new Vector3(bg2_DuneWidth, height, 1f);
 		}
 	}
 

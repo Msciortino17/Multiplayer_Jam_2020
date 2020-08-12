@@ -52,6 +52,11 @@ public class MusicManager : MonoBehaviour
 
 	public void PlayMenuMusic()
 	{
+		if (Menu)
+		{
+			return;
+		}
+
 		Menu = true;
 		MyAudioSource.Stop();
 		MyAudioSource.clip = MenuMusic;
@@ -60,6 +65,11 @@ public class MusicManager : MonoBehaviour
 
 	public void PlayBattleMusic()
 	{
+		if (!Menu)
+		{
+			return;
+		}
+
 		CurrentSong = Random.Range(0, Soundtrack.Count);
 		Menu = false;
 		MyAudioSource.Stop();

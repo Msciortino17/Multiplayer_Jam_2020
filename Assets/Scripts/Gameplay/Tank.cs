@@ -64,6 +64,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public TankGun GunSprite;
 	public ParticleSystem GunBlast;
 	public ParticleSystem GunSmoke;
+	private CameraEffects cameraEffects;
 
 	// Audio
 	public float MovementVolume;
@@ -107,6 +108,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		PrevX = transform.position.x;
 		PrevTurretRot = TurretPivot.rotation.z;
+
+		cameraEffects = CameraEffects.GetReference();
 	}
 
 	// Update is called once per frame
@@ -146,6 +149,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 				WaitingToFire = false;
 
 				// Fire Gun
+				cameraEffects.Shake(0.25f);
 				FireGunAudio.Play();
 				GunSprite.FireGun();
 				GunBlast.Play();
@@ -186,12 +190,21 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			{
 				MovementAudio.volume += Time.deltaTime;
 			}
+
+			if (MyTurn)
+			{
+				cameraEffects.SetTankMoving(true);
+			}
 		}
 		else
 		{
 			if (MovementAudio.volume > 0f)
 			{
 				MovementAudio.volume -= Time.deltaTime;
+			}
+			if (MyTurn)
+			{
+				cameraEffects.SetTankMoving(false);
 			}
 		}
 
@@ -550,7 +563,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	private void AdjustHeight()
 	{
 		Vector3 position = transform.position;
-		position.y = terrain.GetHeightAtX(position.x) + 0.5f;
+		position.y = terrain.GetHeightAtX(position.x);// + terrain.GetSlopeAtX(position.x);
 		transform.position = position;
 	}
 

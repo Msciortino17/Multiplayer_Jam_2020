@@ -95,6 +95,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 				{
 					WaitingToEndGame = true;
 					EndGameTimer = 3f;
+					DarkOverlay.GetReference().SetDarkness(1);
 					DebugText.SetText("Game Over!");
 				}
 			}

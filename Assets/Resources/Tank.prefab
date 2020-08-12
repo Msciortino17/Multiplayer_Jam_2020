@@ -239,8 +239,8 @@ MonoBehaviour:
   MinMoveSpeed: 3
   MaxMoveSpeed: 7
   TurretSpeed: 90
-  MaxTurretAngle: 180
-  MinTurretAngle: 1
+  MaxTurretAngle: 170
+  MinTurretAngle: 10
   BulletPower: 15
   BulletPrefabs:
   - {fileID: 5495807823143105126, guid: abf0d82ec976ffe458d07de60fdda579, type: 3}
@@ -740,7 +740,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3488449329680485465}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.65, z: 0}
+  m_LocalPosition: {x: 0, y: 1.22, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6775681588008322463}
@@ -1679,7 +1679,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6428144601552583098}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.322, z: 0}
+  m_LocalPosition: {x: 0, y: 0.849, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7428886766114479695}
@@ -12499,7 +12499,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8348950506927938971}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.541, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7027645537540037248}
@@ -12542,7 +12542,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.07099986, y: 3.3}
+  m_AnchoredPosition: {x: -0.07099986, y: 3.833}
   m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &483944091691862750

@@ -245,8 +245,8 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			PlayerSetup playerData = PlayerDataList[i];
 			if (playerData.Active.activeInHierarchy)
 			{
-				Tank tank = Instantiate(TankPrefab, TankParent).GetComponent<Tank>(); // todo - init with photon
-				tank.transform.position = new Vector3((counter + 1) * offset, 0f, 0f);
+				Vector3 position = new Vector3((counter + 1) * offset, 0f, 0f);
+				Tank tank = Instantiate(TankPrefab, position, Quaternion.identity, TankParent).GetComponent<Tank>(); // todo - init with photon
 				Tank.ControlType controlType = playerData.GetControlType();
 				tank.Init(playerData.GetName(), counter, playerData.GetColor(), controlType);
 				manager.PlayerTanks.Add(tank);

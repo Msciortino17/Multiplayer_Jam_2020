@@ -20,6 +20,16 @@ public class OptionsMenu : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
+	}
+
+	// Update is called once per frame
+	void Update()
+	{
+
+	}
+
+	public void InitAudio()
+	{
 		float effectVolume = -10f;
 		if (PlayerPrefs.HasKey(effectVolumeKey))
 		{
@@ -36,12 +46,6 @@ public class OptionsMenu : MonoBehaviour
 
 		EffectSlider.value = effectVolume;
 		MusicSlider.value = musicVolume;
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-
 	}
 
 	public void SetEffectVolume(float volume)
