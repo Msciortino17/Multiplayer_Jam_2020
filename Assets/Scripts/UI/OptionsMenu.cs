@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class OptionsMenu : MonoBehaviour
 {
@@ -12,11 +13,17 @@ public class OptionsMenu : MonoBehaviour
 	public PauseMenu PauseMenuRef;
 	public Slider MusicSlider;
 	public Slider EffectSlider;
+	public AudioMixer MasterMixer;
 
 	// Start is called before the first frame update
 	void Start()
 	{
-
+		float effectVolume = 1f;
+		float musicVolume = 1f;
+		MasterMixer.GetFloat("EffectVolume", out effectVolume);
+		MasterMixer.GetFloat("MusicVolume", out musicVolume);
+		EffectSlider.value = effectVolume;
+		MusicSlider.value = musicVolume;
 	}
 
 	// Update is called once per frame
@@ -25,14 +32,14 @@ public class OptionsMenu : MonoBehaviour
 
 	}
 
-	public float GetMusicVolume()
+	public void SetEffectVolume(float volume)
 	{
-		return MusicSlider.value;
+		MasterMixer.SetFloat("EffectVolume", volume);
 	}
 
-	public float GetSoundEffectVolume()
+	public void SetMusicVolume(float volume)
 	{
-		return EffectSlider.value;
+		MasterMixer.SetFloat("MusicVolume", volume);
 	}
 
 	public void Exit()
