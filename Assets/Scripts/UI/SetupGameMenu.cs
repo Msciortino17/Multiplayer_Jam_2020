@@ -235,7 +235,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 			return;
 		}
 
-		terrain.Init(TerrainType.value, Random.Range(0f, 10f));
+		terrain.Init(TerrainType.value, Random.Range(0f, 360f));
 		manager.PlayerTanks = new List<Tank>();
 
 		float offset = terrain.MapWidth / (playerCount + 1);
@@ -384,7 +384,7 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	public override void OnCreatedRoom()
 	{
 		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
-		hash["TerrainSeed"] = Random.Range(0f, 10f);
+		hash["TerrainSeed"] = Random.Range(0f, 360f);
 		PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 	}
 

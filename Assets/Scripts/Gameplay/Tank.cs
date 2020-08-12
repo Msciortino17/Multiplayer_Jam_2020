@@ -541,6 +541,16 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		Vector3 currentPoint = Lump.transform.position;
 		for (int i = 0; i < NumTrajectoryPoints; i++)
 		{
+			if (currentPoint.x > terrain.MapWidth)
+			{
+				currentPoint.x -= terrain.MapWidth;
+			}
+
+			if (currentPoint.x < 0f)
+			{
+				currentPoint.x += terrain.MapWidth;
+			}
+
 			trajectoryPoints.Add(currentPoint);
 
 			currentPoint += bulletVector * TrajectoryTempo;
@@ -564,6 +574,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 				index = trajectoryPoints.Count - 1;
 			}
 			crosshair.transform.position = trajectoryPoints[index];
+			crosshair.transform.rotation = Quaternion.identity;
 			crosshair.WrapWorld(terrain);
 		}
 	}

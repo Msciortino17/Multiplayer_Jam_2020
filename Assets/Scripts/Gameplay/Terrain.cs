@@ -94,11 +94,10 @@ public class Terrain : MonoBehaviour
 
 	private void GenerateSmoothTerrain()
 	{
-		// Sin wave
 		float t = Seed;
 		for (int i = 0; i < NumPoints; i++)
 		{
-			float height = Mathf.Sin(t) + 5;
+			float height = Mathf.Sin(t * .5f) + 5;
 			if (height < 1f)
 			{
 				height = 1f;
@@ -110,30 +109,52 @@ public class Terrain : MonoBehaviour
 
 	private void GenerateStandardTerrain()
 	{
-		// Sin wave
 		float t = Seed;
 		float t2 = Seed;
 		float t3 = Seed;
 		float frequency = 1f / MapWidth;
 		for (int i = 0; i < NumPoints; i++)
 		{
-			float height = 3f * Mathf.Sin(t * .5f) + 10;
-			height += Mathf.Sin(t2 * .75f);
-			height -= 2f * Mathf.Cos(t3);
+			float height = 3f * Mathf.Sin(t * .25f) + 10;
+			t += 0.2f;
+
+			height += Mathf.Sin(t2 * .3f);
+			t2 += 0.2f;
+
+			height -= 2f * Mathf.Cos(t3 * .5f);
+			t3 += 0.2f;
+
 			if (height < 1f)
 			{
 				height = 1f;
 			}
 			heightMap[i] = height;
-			t += 0.1f;
-			t2 += 0.1f;
-			t3 += 0.1f;
 		}
 	}
 
 	private void GenerateRoughTerrain()
 	{
+		float t = Seed;
+		float t2 = Seed;
+		float t3 = Seed;
+		float frequency = 1f / MapWidth;
+		for (int i = 0; i < NumPoints; i++)
+		{
+			float height = 3f * Mathf.Sin(t * .45f) + 10;
+			t += 0.2f;
 
+			height += 3f * Mathf.Sin(t2 * .5f);
+			t2 += 0.2f;
+
+			height += 2f * Mathf.Cos(t3 * .35f);
+			t3 += 0.2f;
+
+			if (height < 1f)
+			{
+				height = 1f;
+			}
+			heightMap[i] = height;
+		}
 	}
 
 	private void SetupDunes()

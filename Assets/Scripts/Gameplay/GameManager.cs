@@ -208,6 +208,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 		WaitingToEndGame = false;
 		WaitingToNextPlayer = false;
+		Terrain.GetReference().initialized = false;
 	}
 
 	public void ClearPlayerObjects()

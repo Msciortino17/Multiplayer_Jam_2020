@@ -6,6 +6,7 @@ public class Beacon : MonoBehaviour
 {
 	private SpriteRenderer MyRenderer;
 	public float Speed;
+	public float OffSet;
 
 	// Start is called before the first frame update
 	void Start()
@@ -17,7 +18,7 @@ public class Beacon : MonoBehaviour
 	void Update()
 	{
 		Color color = MyRenderer.color;
-		color.a = Mathf.PingPong(Time.time * Speed, 1f);
+		color.a = Mathf.PingPong(Time.time * Speed + OffSet, 1f);
 		MyRenderer.color = color;
 	}
 }
