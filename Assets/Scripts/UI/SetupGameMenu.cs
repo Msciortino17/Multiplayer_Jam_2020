@@ -261,16 +261,15 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 	public void Exit()
 	{
-		if (FromOnlineSetup)
-		{
-			Clear();
-			PhotonNetwork.Disconnect();
-			MainMenuRef.gameObject.SetActive(true);
-		}
 		MainMenuRef.gameObject.SetActive(true);
 		manager.EndGame();
 		ResetPlayerData();
 		gameObject.SetActive(false);
+		if (FromOnlineSetup)
+		{
+			PhotonNetwork.Disconnect();
+			MainMenuRef.gameObject.SetActive(true);
+		}
 	}
 
 	public int GetPlayerCount()

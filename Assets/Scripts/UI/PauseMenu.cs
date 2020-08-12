@@ -38,5 +38,6 @@ public class PauseMenu : MonoBehaviour
 		SetupGameRef.Exit();
 		MainMenuRef.gameObject.SetActive(true);
 		gameObject.SetActive(false);
+		DarkOverlay.GetReference().SetDarkness(0f);
 	}
 }

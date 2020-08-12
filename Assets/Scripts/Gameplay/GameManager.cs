@@ -1,5 +1,6 @@
 ﻿using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -80,7 +81,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 				WaitingToNextPlayer = false;
 
 				CurrentPlayer++;
-				if (CurrentPlayer == PlayerTanks.Count)
+				if (CurrentPlayer >= PlayerTanks.Count)
 				{
 					CurrentPlayer = 0;
 					NextTurn();
@@ -144,6 +145,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 	private int CheckWinner()
 	{
+		// If there's only one player left, they win
+		if (PlayerTanks.Count == 1)
+		{
+			return 0;
+		}
+
 		// Tally up the dead to see if there's one left
 		int deathCheck = 0;
 		for (int i = 0; i < PlayerTanks.Count; i++)
@@ -287,6 +294,38 @@ public class GameManager : MonoBehaviourPunCallbacks
 			WindDirection = (int)hash["WindDirection"];
 			WindTurns = (int)hash["WindTurns"];
 			SandstormRef.UpdateWind(WindDirection);
+		}
+	}
+	
+	public override void OnPlayerLeftRoom(Player otherPlayer)
+	{
+		if (Started)
+		{
+			// Remove the missing tank
+			Tank currentTank = GetCurrentPlayer();
+			Tank leavingTank = null;
+			for (int i = 0; i < PlayerTanks.Count; i++)
+			{
+				if (otherPlayer.ActorNumber == PlayerTanks[i].OnlineNumber)
+				{
+					leavingTank = PlayerTanks[i];
+					PlayerTanks.RemoveAt(i);
+					break;
+				}
+			}
+
+			if (leavingTank != null)
+			{
+				// If it's that tanks turn or there's only one player left, increment to next turn
+				if (leavingTank == currentTank || PlayerTanks.Count == 1)
+				{
+					WaitingToNextPlayer = true;
+					NextPlayerTimer = 0.5f;
+				}
+
+				// Spawn a dead tank on the leaving tank's body
+				// to-do
+			}
 		}
 	}
 }
