@@ -7,6 +7,8 @@ using UnityEngine.Audio;
 public class OptionsMenu : MonoBehaviour
 {
 	public bool FromMainMenu;
+	private const string effectVolumeKey = "EffectVolume";
+	private const string musicVolumeKey = "MusicVolume";
 
 	// References
 	public MainMenu MainMenuRef;
@@ -18,10 +20,20 @@ public class OptionsMenu : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		float effectVolume = 1f;
-		float musicVolume = 1f;
-		MasterMixer.GetFloat("EffectVolume", out effectVolume);
-		MasterMixer.GetFloat("MusicVolume", out musicVolume);
+		float effectVolume = -10f;
+		if (PlayerPrefs.HasKey(effectVolumeKey))
+		{
+			effectVolume = PlayerPrefs.GetFloat(effectVolumeKey);
+		}
+		MasterMixer.SetFloat("EffectVolume", effectVolume);
+
+		float musicVolume = -10f;
+		if (PlayerPrefs.HasKey(musicVolumeKey))
+		{
+			musicVolume = PlayerPrefs.GetFloat(musicVolumeKey);
+		}
+		MasterMixer.SetFloat("MusicVolume", musicVolume);
+
 		EffectSlider.value = effectVolume;
 		MusicSlider.value = musicVolume;
 	}
@@ -35,11 +47,13 @@ public class OptionsMenu : MonoBehaviour
 	public void SetEffectVolume(float volume)
 	{
 		MasterMixer.SetFloat("EffectVolume", volume);
+		PlayerPrefs.SetFloat(effectVolumeKey, volume);
 	}
 
 	public void SetMusicVolume(float volume)
 	{
 		MasterMixer.SetFloat("MusicVolume", volume);
+		PlayerPrefs.SetFloat(musicVolumeKey, volume);
 	}
 
 	public void Exit()

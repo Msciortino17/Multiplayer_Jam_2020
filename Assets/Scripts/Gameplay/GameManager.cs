@@ -124,6 +124,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 		CurrentPlayer = 0;
 		GetCurrentPlayer().StartTurn();
 		Winner = -1;
+		MusicManager.GetReference().PlayBattleMusic();
 
 		if (!OnlineGame || PhotonNetwork.IsMasterClient)
 		{
@@ -209,6 +210,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 		WaitingToEndGame = false;
 		WaitingToNextPlayer = false;
 		Terrain.GetReference().initialized = false;
+		MusicManager.GetReference().PlayMenuMusic();
 	}
 
 	public void ClearPlayerObjects()
