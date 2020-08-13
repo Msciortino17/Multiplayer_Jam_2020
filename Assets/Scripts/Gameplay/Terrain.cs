@@ -228,8 +228,8 @@ public class Terrain : MonoBehaviour
 		{
 			GameObject dune = Instantiate(DunePrefab, transform);
 			float height = heightMap[i];
-			dune.transform.position = new Vector3(i * DuneWidth, height * 0.5f + 0.2f, 0f);
-			dune.transform.localScale = new Vector3(DuneWidth, height, 1f);
+			dune.transform.position = new Vector3(i * DuneWidth, height * 0.5f, 0f);
+			dune.transform.localScale = new Vector3(DuneWidth, height + .2f, 1f);
 		}
 
 		// Background

@@ -4902,7 +4902,7 @@ MonoBehaviour:
   IsHyperSonic: 0
   IsScatter: 0
   SpawnExplosion: 1
-  Damage: 40
+  Damage: 20
   ExplosionRadius: 1
   ExplosionPrefab: {fileID: 6988215034798635393, guid: 027eaaf88a53f5444a8c0bea00a25a5f,
     type: 3}
