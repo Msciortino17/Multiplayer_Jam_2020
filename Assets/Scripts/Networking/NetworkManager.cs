@@ -48,7 +48,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		schema.Add("WindDirection", 0);
 		schema.Add("WindTurns", 0);
 		schema.Add("TerrainSeed", 0f);
-		Debug.Log("lmao");
+		schema.Add("BonusBox_X", -100f);
+		schema.Add("BonusBox_Y", -100f);
+		schema.Add("BonusBox_NextBullet", 1);
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -72,6 +74,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		schema.Add("Ready", false);
 		schema.Add("Health", 100f);
 		schema.Add("Fuel", 100f);
+		schema.Add("NextBullet", 0);
 
 		player.SetCustomProperties(schema);
 	}

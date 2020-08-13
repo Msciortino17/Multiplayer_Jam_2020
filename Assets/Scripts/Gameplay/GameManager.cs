@@ -18,10 +18,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 	public bool Paused;
 	public int Winner;
 
+	public BonusBox BonusBoxRef;
 	public Sandstorm SandstormRef;
 	public GameOverMenu GameOverRef;
 	public Text GameOverText;
 
+	public List<GameObject> BulletPrefabs;
 	public List<Tank> PlayerTanks;
 	public int CurrentPlayer;
 
@@ -54,8 +56,10 @@ public class GameManager : MonoBehaviourPunCallbacks
 	{
 		if (Started)
 		{
-			string message = "Current player: " + CurrentPlayer;
-			message += "\n" + GetCurrentPlayer().TankName + " : " + GetCurrentPlayer().OnlineNumber;
+			Tank currentPlayer = GetCurrentPlayer();
+			string message = currentPlayer.TankName + "'s Turn. Health: " + currentPlayer.Health.ToString("0.00");
+			message += " Fuel: " + currentPlayer.Fuel.ToString("0.00");
+			message += " Munition: " + BulletPrefabs[currentPlayer.BulletType].name;
 			DebugText.SetText(message);
 
 			if (Input.GetKeyDown(KeyCode.Escape))
@@ -95,7 +99,14 @@ public class GameManager : MonoBehaviourPunCallbacks
 					{
 						WaitingToEndGame = true;
 						EndGameTimer = 8f;
-						DebugText.SetText("Game Over!");
+					}
+
+					if (!OnlineGame || PhotonNetwork.IsMasterClient)
+					{
+						if (Random.Range(0, 10) > 2)
+						{
+							BonusBoxRef.Spawn(Terrain.GetReference().HighestPoint + 2f);
+						}
 					}
 				}
 			}
@@ -118,7 +129,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 			}
 		}
 	}
-
+	
 	public void Init(bool online)
 	{
 		Started = true;
@@ -222,6 +233,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 		WaitingToNextPlayer = false;
 		Terrain.GetReference().initialized = false;
 		MusicManager.GetReference().PlayMenuMusic();
+		DebugText.SetText("");
 	}
 
 	public void ClearPlayerObjects()
@@ -283,6 +295,16 @@ public class GameManager : MonoBehaviourPunCallbacks
 			int windTurns = Random.Range(1, 4);
 			SetWind(windDirection, windTurns);
 		}
+
+		for (int i = 0; i < PlayerTanks.Count; i++)
+		{
+			Tank tank = PlayerTanks[i];
+			if (tank.BulletResetCounter <= 0)
+			{
+				tank.BulletType = 0;
+			}
+			tank.BulletResetCounter--;
+		}
 	}
 
 	public void SetWind(int direction, int turns)
@@ -338,7 +360,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 				{
 					WaitingToNextPlayer = true;
 					NextPlayerTimer = 0.5f;
-					DarkOverlay.GetReference().SetDarkness(1);
 
 					if (PlayerTanks.Count == 1)
 					{
@@ -347,7 +368,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 				}
 
 				// Spawn a dead tank on the leaving tank's body
-				// to-do
+				leavingTank.SpawnDeadTank();
 			}
 		}
 	}

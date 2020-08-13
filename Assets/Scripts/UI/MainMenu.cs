@@ -10,6 +10,7 @@ public class MainMenu : MonoBehaviour
 	public SetupOnlineMenu SetupOnlineRef;
 	public OptionsMenu OptionsMenuRef;
 	public GameObject CreditsMenu;
+	public GameObject HowToPlayMenu;
 	public GameObject ExitButton;
 
 	// Start is called before the first frame update
@@ -54,6 +55,12 @@ public class MainMenu : MonoBehaviour
 	public void Credits()
 	{
 		CreditsMenu.SetActive(true);
+		gameObject.SetActive(false);
+	}
+
+	public void HowToPlay()
+	{
+		HowToPlayMenu.SetActive(true);
 		gameObject.SetActive(false);
 	}
 

@@ -4847,7 +4847,7 @@ GameObject:
   - component: {fileID: 5495807823143105144}
   - component: {fileID: 5495807823143105127}
   m_Layer: 0
-  m_Name: NormalBullet
+  m_Name: Standard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4902,7 +4902,7 @@ MonoBehaviour:
   IsHyperSonic: 0
   IsScatter: 0
   SpawnExplosion: 1
-  Damage: 20
+  Damage: 10
   ExplosionRadius: 1
   ExplosionPrefab: {fileID: 6988215034798635393, guid: 027eaaf88a53f5444a8c0bea00a25a5f,
     type: 3}

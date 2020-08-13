@@ -95,7 +95,6 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		{
 			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 			float seed = (float)hash["TerrainSeed"];
-			DebugText.SetText("Seed: " + seed);
 
 			TerrainType.interactable = PhotonNetwork.IsMasterClient;
 
@@ -394,7 +393,6 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 		{
 			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 			hash["TerrainSeed"] = Random.Range(0f, 360f);
-			Debug.Log("ayy");
 			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 
 			PlayerJoinedroom(newPlayer);

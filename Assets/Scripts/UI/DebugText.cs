@@ -12,7 +12,11 @@ public class DebugText : MonoBehaviour
 	void Start()
 	{
 		MyText = GetComponent<Text>();
-		reference = GameObject.Find("Canvas").transform.Find("DebugText").GetComponent<DebugText>();
+
+		Transform canvas = GameObject.Find("Canvas").transform;
+		Transform debugText = canvas.Find("DebugText");
+
+		reference = debugText.GetComponent<DebugText>();
 	}
 
 	/// <summary>
@@ -21,6 +25,8 @@ public class DebugText : MonoBehaviour
 	/// </summary>
 	public static void SetText(string text)
 	{
+		bool referenceNull = (reference == null);
+		bool textNull = (reference.MyText == null);
 		reference.MyText.text = text;
 	}
 }

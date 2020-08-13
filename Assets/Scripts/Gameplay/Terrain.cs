@@ -8,6 +8,8 @@ public class Terrain : MonoBehaviour
 
 	public bool initialized;
 
+	public float HighestPoint;
+
 	// Main data model
 	private float[] heightMap;
 	public float MapWidth;
@@ -102,6 +104,15 @@ public class Terrain : MonoBehaviour
 		bg1_Seed = Random.Range(0, 360f);
 		bg2_Seed = Random.Range(0, 360f);
 		GenerateBackground();
+
+		HighestPoint = heightMap[0];
+		for (int i = 0; i < heightMap.Length; i++)
+		{
+			if (heightMap[i] > HighestPoint)
+			{
+				HighestPoint = heightMap[i];
+			}
+		}
 
 		SetupDunes();
 	}

@@ -37,8 +37,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public float MaxTurretAngle;
 	public float MinTurretAngle;
 	public float BulletPower;
-	public GameObject[] BulletPrefabs;
 	public int BulletType;
+	public int BulletResetCounter;
 	public Transform TurretPivot;
 	public Transform Lump;
 	private float FireDelayTimer;
@@ -140,9 +140,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		if (Health <= 0f)
 		{
-			DeadTank deadTank = Instantiate(DeadTankPrefab, transform.parent).GetComponent<DeadTank>();
-			deadTank.Init(transform.position, transform.rotation, TurretPivot.rotation, MyColor);
-			gameObject.SetActive(false);
+			SpawnDeadTank();
 			MyHoverText.text = TankName + " RIP";
 		}
 
@@ -161,7 +159,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 				GunSmoke.Play();
 
 				// Setup the bullet
-				GameObject bullet = Instantiate(BulletPrefabs[BulletType]);
+				GameObject bullet = Instantiate(manager.BulletPrefabs[BulletType]);
 				Vector3 bulletVector = Lump.position - TurretPivot.position;
 				bulletVector.Normalize();
 				bulletVector *= BulletPower;
@@ -175,6 +173,13 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		MyHoverText.gameObject.SetActive(!manager.Paused);
 		MovementEffects();
+	}
+
+	public void SpawnDeadTank()
+	{
+		DeadTank deadTank = Instantiate(DeadTankPrefab, transform.parent).GetComponent<DeadTank>();
+		deadTank.Init(transform.position, transform.rotation, TurretPivot.rotation, MyColor);
+		gameObject.SetActive(false);
 	}
 
 	private void MovementEffects()
@@ -687,12 +692,27 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		setup.NumLoadedTanks++;
 	}
 
-	//public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-	//{
-	//	ReadHealthSettings();
-	//	ReadFuelSettings();
-	//	MyHoverText.text = TankName + " : " + OnlineNumber + "\nHealth: " + Health.ToString("0.00") + "\nFuel: " + Fuel.ToString("0.00");
-	//}
+	public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+	{
+		if (targetPlayer != MyPlayer)
+		{
+			return;
+		}
+
+		if (changedProps.ContainsKey("NextBullet"))
+		{
+			BulletType = (int)changedProps["NextBullet"];
+		}
+
+		if (changedProps.ContainsKey("Health"))
+		{
+			Health = (float)changedProps["Health"];
+		}
+
+		//ReadHealthSettings();
+		//ReadFuelSettings();
+		//MyHoverText.text = TankName + " : " + OnlineNumber + "\nHealth: " + Health.ToString("0.00") + "\nFuel: " + Fuel.ToString("0.00");
+	}
 
 	//public void ReadHealthSettings()
 	//{

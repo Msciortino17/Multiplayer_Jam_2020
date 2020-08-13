@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class Bullet : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class Bullet : MonoBehaviour
 	public bool IsScatter;
 	public bool SpawnExplosion;
 	public float Damage;
-	public int ExplosionRadius;
+	public float ExplosionRadius;
 	public GameObject ExplosionPrefab;
 	public GameObject DirtParticlePrefab;
 	public GameObject ScatterBulletPrefab;
@@ -63,7 +64,24 @@ public class Bullet : MonoBehaviour
 		{
 			if (!SpawnExplosion)
 			{
-				otherTank.Health -= Damage;
+				if (!manager.OnlineGame || PhotonNetwork.IsMasterClient)
+				{
+					otherTank.Health -= Damage;
+					if (PhotonNetwork.IsMasterClient)
+					{
+						Hashtable hash = otherTank.MyPlayer.CustomProperties;
+						hash["Health"] = otherTank.Health;
+						otherTank.MyPlayer.SetCustomProperties(hash);
+					}
+				}
+
+				BulletExplosion explosion = Instantiate(ExplosionPrefab).GetComponent<BulletExplosion>();
+				explosion.transform.position = transform.position;
+				explosion.transform.localScale = new Vector3(ExplosionRadius, ExplosionRadius, ExplosionRadius);
+				explosion.Damage = 0;
+				AudioSource audio = explosion.GetComponent<AudioSource>();
+				audio.clip = ExplosionSound;
+				audio.Play();
 			}
 			Explode();
 		}
