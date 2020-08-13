@@ -93,6 +93,10 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 	{
 		if (FromOnlineSetup)
 		{
+			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+			float seed = (float)hash["TerrainSeed"];
+			DebugText.SetText("Seed: " + seed);
+
 			TerrainType.interactable = PhotonNetwork.IsMasterClient;
 
 			if (WaitingForOthersToStart && NumLoadedTanks == GetPlayerCount())
@@ -382,15 +386,17 @@ public class SetupGameMenu : MonoBehaviourPunCallbacks
 
 	public override void OnCreatedRoom()
 	{
-		Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
-		hash["TerrainSeed"] = Random.Range(0f, 360f);
-		PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 	}
 
 	public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
 		if (PhotonNetwork.IsMasterClient)
 		{
+			Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
+			hash["TerrainSeed"] = Random.Range(0f, 360f);
+			Debug.Log("ayy");
+			PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+
 			PlayerJoinedroom(newPlayer);
 			RefreshUIWrite();
 		}

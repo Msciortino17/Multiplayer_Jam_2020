@@ -241,8 +241,8 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	{
 		terrain = Terrain.GetReference();
 		manager = GameManager.GetReference();
-		AdjustHeight();
 		AdjustAngle();
+		AdjustHeight();
 
 		BulletType = 0;
 
@@ -563,7 +563,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	private void AdjustHeight()
 	{
 		Vector3 position = transform.position;
-		position.y = terrain.GetHeightAtX(position.x);// + terrain.GetSlopeAtX(position.x);
+		position.y = terrain.GetHeightAtX(position.x);// - terrain.GetSlopeAtX(position.x) * 0.25f;
 		transform.position = position;
 	}
 
@@ -669,7 +669,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 			{
 				if (playerData.OnlineNumber == OnlineNumber)
 				{
-					Vector3 position = new Vector3((counter + 1) * offset, 0f, 0f);
+					transform.position = new Vector3((counter + 1) * offset, 0f, 0f);
 					transform.parent = setup.TankParent;
 					Init(playerData.GetName(), counter, playerData.GetColor(), ControlType.NetworkPlayer);
 					manager.PlayerTanks.Add(this);

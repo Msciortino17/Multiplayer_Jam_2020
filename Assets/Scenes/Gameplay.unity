@@ -14134,12 +14134,12 @@ MonoBehaviour:
   bg1_NumPoints: 250
   bg1_GenFrequency: 0.4
   bg1_GenAmplitude: 1.5
-  bg1_GenBottom: 7
+  bg1_GenBottom: 12
   bg1_Seed: 0
   bg2_NumPoints: 250
   bg2_GenFrequency: 0.3
   bg2_GenAmplitude: 1.5
-  bg2_GenBottom: 10
+  bg2_GenBottom: 16
   bg2_Seed: 0
   DunePrefab: {fileID: 4594932126126424294, guid: 676fbd5396dbb054e84a7687e2e83c06,
     type: 3}
@@ -14748,7 +14748,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1357173157
 RectTransform:
   m_ObjectHideFlags: 0

@@ -57,61 +57,63 @@ public class GameManager : MonoBehaviourPunCallbacks
 			string message = "Current player: " + CurrentPlayer;
 			message += "\n" + GetCurrentPlayer().TankName + " : " + GetCurrentPlayer().OnlineNumber;
 			DebugText.SetText(message);
-		}
 
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{
-			if (Paused)
+			if (Input.GetKeyDown(KeyCode.Escape))
 			{
-				Paused = false;
-				PauseMenuRef.Unpause();
-			}
-			else
-			{
-				Paused = true;
-				PauseMenuRef.gameObject.SetActive(true);
-			}
-		}
-
-		if (WaitingToNextPlayer)
-		{
-			NextPlayerTimer -= Time.deltaTime;
-			if (NextPlayerTimer <= 0f)
-			{
-				WaitingToNextPlayer = false;
-
-				CurrentPlayer++;
-				if (CurrentPlayer >= PlayerTanks.Count)
+				if (Paused)
 				{
-					CurrentPlayer = 0;
-					NextTurn();
-				}
-
-				Winner = CheckWinner();
-				if (Winner == -1)
-				{
-					GetCurrentPlayer().StartTurn();
+					Paused = false;
+					PauseMenuRef.Unpause();
 				}
 				else
 				{
-					WaitingToEndGame = true;
-					EndGameTimer = 3f;
-					DarkOverlay.GetReference().SetDarkness(1);
-					DebugText.SetText("Game Over!");
+					Paused = true;
+					PauseMenuRef.gameObject.SetActive(true);
 				}
 			}
-		}
 
-		if (WaitingToEndGame)
-		{
-			EndGameTimer -= Time.deltaTime;
-			if (EndGameTimer <= 0f)
+			if (WaitingToNextPlayer)
 			{
-				WaitingToEndGame = false;
+				NextPlayerTimer -= Time.deltaTime;
+				if (NextPlayerTimer <= 0f)
+				{
+					WaitingToNextPlayer = false;
 
-				GameOverRef.gameObject.SetActive(true);
-				GameOverText.text = "Game Over\n\nThe winner is " + PlayerTanks[Winner].TankName;
-				EndGame();
+					CurrentPlayer++;
+					if (CurrentPlayer >= PlayerTanks.Count)
+					{
+						CurrentPlayer = 0;
+						NextTurn();
+					}
+
+					Winner = CheckWinner();
+					if (Winner == -1)
+					{
+						GetCurrentPlayer().StartTurn();
+					}
+					else
+					{
+						WaitingToEndGame = true;
+						EndGameTimer = 3f;
+						DebugText.SetText("Game Over!");
+					}
+				}
+			}
+
+			if (WaitingToEndGame)
+			{
+				EndGameTimer -= Time.deltaTime;
+				if (EndGameTimer <= 3f)
+				{
+				}
+				if (EndGameTimer <= 0f)
+				{
+					WaitingToEndGame = false;
+
+					GameOverRef.gameObject.SetActive(true);
+					GameOverText.text = "Game Over\n\nThe winner is " + PlayerTanks[Winner].TankName;
+					EndGame();
+				}
 			}
 		}
 	}
@@ -321,6 +323,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 				{
 					WaitingToNextPlayer = true;
 					NextPlayerTimer = 0.5f;
+					DarkOverlay.GetReference().SetDarkness(1);
+
+					if (PlayerTanks.Count == 1)
+					{
+						CurrentPlayer = 0;
+					}
 				}
 
 				// Spawn a dead tank on the leaving tank's body
