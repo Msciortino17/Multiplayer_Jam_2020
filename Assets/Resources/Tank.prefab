@@ -252,7 +252,7 @@ MonoBehaviour:
   MyHoverText: {fileID: 8579105608568844467}
   MinMoveSpeed: 3
   MaxMoveSpeed: 7
-  TurretSpeed: 90
+  TurretSpeed: 60
   MaxTurretAngle: 170
   MinTurretAngle: 10
   BulletPower: 15
@@ -267,6 +267,7 @@ MonoBehaviour:
   Health: 100
   Fuel: 100
   FuelConsumption: 20
+  MyColor: {r: 0, g: 0, b: 0, a: 0}
   MyWheels: []
   MinWheelSpin: 90
   MaxWheelSpin: 360
@@ -277,6 +278,8 @@ MonoBehaviour:
   GunSprite: {fileID: 6261959110016352680}
   GunBlast: {fileID: 5558801704214702943}
   GunSmoke: {fileID: 5649132754503888285}
+  DeadTankPrefab: {fileID: 4942932349289355233, guid: 4e92afb76fe249d40a230cd1e2863b37,
+    type: 3}
   MovementVolume: 1
   TurretVolume: 1
   MovementAudio: {fileID: 5826649617811993566}

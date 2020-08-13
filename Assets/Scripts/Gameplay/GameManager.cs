@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 					else
 					{
 						WaitingToEndGame = true;
-						EndGameTimer = 3f;
+						EndGameTimer = 8f;
 						DebugText.SetText("Game Over!");
 					}
 				}
@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 				EndGameTimer -= Time.deltaTime;
 				if (EndGameTimer <= 3f)
 				{
+					DarkOverlay.GetReference().SetDarkness(1f);
 				}
 				if (EndGameTimer <= 0f)
 				{
@@ -132,8 +133,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 		if (!OnlineGame || PhotonNetwork.IsMasterClient)
 		{
-			int windDirection = Random.Range(-1, 2);
-			int windTurns = Random.Range(1, 2);
+			int windDirection = 0;// Random.Range(-1, 2);
+			int windTurns = Random.Range(1, 3);
 			SetWind(windDirection, windTurns);
 		}
 
@@ -240,6 +241,16 @@ public class GameManager : MonoBehaviourPunCallbacks
 			}
 		}
 		PlayerTanks.Clear();
+
+		Transform tanksParent = GameObject.Find("Tanks").transform;
+		DeadTank[] deadTanks = tanksParent.GetComponentsInChildren<DeadTank>();
+		if (deadTanks != null && deadTanks.Length > 0)
+		{
+			foreach (DeadTank deadTank in deadTanks)
+			{
+				Destroy(deadTank.gameObject);
+			}
+		}
 	}
 
 	/// <summary>
@@ -264,8 +275,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 				return;
 			}
 
-			int windDirection = Random.Range(-1, 2);
-			int windTurns = Random.Range(1, 2);
+			int windDirection = 0;
+			if (Random.Range(0, 10) > 6)
+			{
+				windDirection = Random.Range(-1, 2);
+			}
+			int windTurns = Random.Range(1, 4);
 			SetWind(windDirection, windTurns);
 		}
 	}

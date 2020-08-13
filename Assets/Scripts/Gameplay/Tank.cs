@@ -53,6 +53,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public float FuelConsumption;
 
 	// Visual effect stuff
+	public Color MyColor;
 	public List<TankWheel> MyWheels;
 	public float MinWheelSpin;
 	public float MaxWheelSpin;
@@ -65,6 +66,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	public ParticleSystem GunBlast;
 	public ParticleSystem GunSmoke;
 	private CameraEffects cameraEffects;
+	public GameObject DeadTankPrefab;
 
 	// Audio
 	public float MovementVolume;
@@ -138,6 +140,9 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 
 		if (Health <= 0f)
 		{
+			DeadTank deadTank = Instantiate(DeadTankPrefab, transform.parent).GetComponent<DeadTank>();
+			deadTank.Init(transform.position, transform.rotation, TurretPivot.rotation, MyColor);
+			gameObject.SetActive(false);
 			MyHoverText.text = TankName + " RIP";
 		}
 
@@ -253,6 +258,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 		//ChasisSprite.color = color;
 		//TurretSprite.color = color;
 		//LumpSprite.color = color;
+		MyColor = color;
 		ColorSetter[] colorSetters = GetComponentsInChildren<ColorSetter>();
 		for (int i = 0; i < colorSetters.Length; i++)
 		{
