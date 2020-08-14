@@ -50,12 +50,20 @@ public class OptionsMenu : MonoBehaviour
 
 	public void SetEffectVolume(float volume)
 	{
+		if (volume < -39f)
+		{
+			volume = -80f;
+		}
 		MasterMixer.SetFloat("EffectVolume", volume);
 		PlayerPrefs.SetFloat(effectVolumeKey, volume);
 	}
 
 	public void SetMusicVolume(float volume)
 	{
+		if (volume < -39f)
+		{
+			volume = -80f;
+		}
 		MasterMixer.SetFloat("MusicVolume", volume);
 		PlayerPrefs.SetFloat(musicVolumeKey, volume);
 	}

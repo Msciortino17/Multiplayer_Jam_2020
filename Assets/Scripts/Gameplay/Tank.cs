@@ -165,6 +165,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 				bulletVector *= BulletPower;
 				bullet.GetComponent<Bullet>().velocity = bulletVector;
 				bullet.transform.position = Lump.position;
+				BulletType = 0;
 
 				// End turn
 				manager.NextPlayer();
@@ -574,7 +575,7 @@ public class Tank : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback
 	private void AdjustHeight()
 	{
 		Vector3 position = transform.position;
-		position.y = terrain.GetHeightAtX(position.x);// - terrain.GetSlopeAtX(position.x) * 0.25f;
+		position.y = terrain.GetHeightAtX(position.x) - 0.2f;// - terrain.GetSlopeAtX(position.x) * 0.25f;
 		transform.position = position;
 	}
 

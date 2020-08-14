@@ -629,6 +629,8 @@ MonoBehaviour:
   - {fileID: 5495807823143105126, guid: abf0d82ec976ffe458d07de60fdda579, type: 3}
   - {fileID: 8422601186099884456, guid: 3c2420489ed0394439d37e9a4efba3e7, type: 3}
   - {fileID: 9020018143624768169, guid: 2cd8130fb6ffb2a499a635bebe03395d, type: 3}
+  - {fileID: 9035843122280949327, guid: a656833ef592729449dd856c3b386550, type: 3}
+  - {fileID: 7989783654310570594, guid: 61b40877bab7a3245abd2183c3390d75, type: 3}
   PlayerTanks: []
   CurrentPlayer: 0
   WindTurns: 0
@@ -2959,7 +2961,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -640}
+  m_AnchoredPosition: {x: 50, y: -690}
   m_SizeDelta: {x: 200, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &224896532
@@ -16281,8 +16283,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -300}
-  m_SizeDelta: {x: 800, y: 600}
+  m_AnchoredPosition: {x: 50, y: -325}
+  m_SizeDelta: {x: 900, y: 650}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1469841495
 MonoBehaviour:
@@ -16337,7 +16339,11 @@ MonoBehaviour:
     space to fire the gun
 
 
-    An active sandstorm will affect trajectory'
+    An active sandstorm will affect trajectory
+
+
+    Shoot
+    bonus hexagons for a random bullet next turn'
 --- !u!222 &1469841496
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18228,8 +18234,8 @@ MonoBehaviour:
   m_FillRect: {fileID: 1389818159}
   m_HandleRect: {fileID: 389655619}
   m_Direction: 0
-  m_MinValue: -80
-  m_MaxValue: 20
+  m_MinValue: -40
+  m_MaxValue: 5
   m_WholeNumbers: 0
   m_Value: -10
   m_OnValueChanged:
@@ -19423,8 +19429,8 @@ MonoBehaviour:
   m_FillRect: {fileID: 2143628598}
   m_HandleRect: {fileID: 2075100173}
   m_Direction: 0
-  m_MinValue: -80
-  m_MaxValue: 20
+  m_MinValue: -40
+  m_MaxValue: 5
   m_WholeNumbers: 0
   m_Value: -10
   m_OnValueChanged:
@@ -19866,7 +19872,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 6332bf5efc21f3d44a7c0c286bfc4e19, type: 3}
   - {fileID: 8300000, guid: d02177b7cb7a53d4cb78ac5c9e832a79, type: 3}
   - {fileID: 8300000, guid: 7c9807b6cd3dc364aa3ef0c76fb46e29, type: 3}
-  - {fileID: 8300000, guid: 3015e8b979574dd4ab34c3c6c777ad30, type: 3}
   CurrentSong: 0
   Menu: 0
 --- !u!4 &1794236187

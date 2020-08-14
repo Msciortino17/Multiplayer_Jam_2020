@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class BulletExplosion : MonoBehaviour
 {
@@ -19,7 +21,17 @@ public class BulletExplosion : MonoBehaviour
 		Tank otherTank = other.GetComponent<Tank>();
 		if (otherTank != null)
 		{
-			otherTank.Health -= Damage;
+			GameManager manager = GameManager.GetReference();
+			if (!manager.OnlineGame || PhotonNetwork.IsMasterClient)
+			{
+				otherTank.Health -= Damage;
+				if (PhotonNetwork.IsMasterClient)
+				{
+					Hashtable hash = otherTank.MyPlayer.CustomProperties;
+					hash["Health"] = otherTank.Health;
+					otherTank.MyPlayer.SetCustomProperties(hash);
+				}
+			}
 		}
 	}
 }

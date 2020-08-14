@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 					if (!OnlineGame || PhotonNetwork.IsMasterClient)
 					{
-						if (Random.Range(0, 10) > 2)
+						if (Random.Range(0, 10) > 6)
 						{
 							BonusBoxRef.Spawn(Terrain.GetReference().HighestPoint + 2f);
 						}
@@ -120,6 +120,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 				}
 				if (EndGameTimer <= 0f)
 				{
+					DarkOverlay.GetReference().SetDarkness(0f);
 					WaitingToEndGame = false;
 
 					GameOverRef.gameObject.SetActive(true);
@@ -301,7 +302,20 @@ public class GameManager : MonoBehaviourPunCallbacks
 			Tank tank = PlayerTanks[i];
 			if (tank.BulletResetCounter <= 0)
 			{
-				tank.BulletType = 0;
+				if (OnlineGame)
+				{
+					if (PhotonNetwork.IsMasterClient)
+					{
+						tank.BulletType = 0;
+						Hashtable hash = tank.MyPlayer.CustomProperties;
+						hash["NextBullet"] = 0;
+						tank.MyPlayer.SetCustomProperties(hash);
+					}
+				}
+				else
+				{
+					tank.BulletType = 0;
+				}
 			}
 			tank.BulletResetCounter--;
 		}

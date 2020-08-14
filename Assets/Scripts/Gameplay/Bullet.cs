@@ -24,6 +24,14 @@ public class Bullet : MonoBehaviour
 	public GameObject ExplosionPrefab;
 	public GameObject DirtParticlePrefab;
 	public GameObject ScatterBulletPrefab;
+	public GameObject HypersonicBurstPrefab;
+	public GameObject ScatterParticlePrefab;
+
+	private bool Descending;
+	private bool GoingLeft;
+	private float PrevY;
+	public float HyperAccel;
+	public bool IgnoreLanding;
 
 	public AudioClip ExplosionSound;
 
@@ -35,6 +43,7 @@ public class Bullet : MonoBehaviour
 		terrain = Terrain.GetReference();
 		manager = GameManager.GetReference();
 		cameraEffects = CameraEffects.GetReference();
+		PrevY = transform.position.y;
 	}
 
 	// Update is called once per frame
@@ -55,6 +64,42 @@ public class Bullet : MonoBehaviour
 		transform.Translate(velocity * Time.deltaTime);
 		velocity += Physics.gravity * Time.deltaTime;
 		velocity += manager.GetWind() * Time.deltaTime;
+
+		if (PrevY > transform.position.y)
+		{
+			if (!Descending && IsHyperSonic)
+			{
+				Instantiate(HypersonicBurstPrefab, transform.position, Quaternion.identity, null);
+			}
+			if (!Descending && IsScatter)
+			{
+				Instantiate(ScatterParticlePrefab, transform.position, Quaternion.identity, null);
+				for (int i = 0; i < 5; i++)
+				{
+					Bullet smallBullet = Instantiate(ScatterBulletPrefab, transform.position, Quaternion.identity, null).GetComponent<Bullet>();
+					smallBullet.velocity = velocity;
+					smallBullet.velocity.x -= i;
+					if (i != 0)
+					{
+						smallBullet.IgnoreLanding = true;
+					}
+				}
+				Destroy(gameObject);
+			}
+			Descending = true;
+		}
+		if (Descending && IsHyperSonic)
+		{
+			if (velocity.x > 0f)
+			{
+				velocity.x += HyperAccel * Time.deltaTime;
+			}
+			else
+			{
+				velocity.x -= HyperAccel * Time.deltaTime;
+			}
+		}
+		PrevY = transform.position.y;
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -93,6 +138,10 @@ public class Bullet : MonoBehaviour
 		float ground = terrain.GetHeightAtX(position.x);
 		if (position.y < ground )
 		{
+			if (!SpawnExplosion)
+			{
+				Instantiate(DirtParticlePrefab, transform.position, Quaternion.identity, null);
+			}
 			Explode();
 		}
 	}
@@ -116,7 +165,10 @@ public class Bullet : MonoBehaviour
 		}
 
 		Destroy(gameObject);
-		manager.BulletLanded();
+		if (!IgnoreLanding)
+		{
+			manager.BulletLanded();
+		}
 		// todo - cause different effects here depending on the bullet
 	}
 
